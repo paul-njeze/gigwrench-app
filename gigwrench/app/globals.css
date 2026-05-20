@@ -1,15 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --font-display: 'Bebas Neue', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+@theme {
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+  --color-gw-bg: #07090D;
+    --color-gw-bg2: #0B0F17;
+    --color-gw-bg3: #0F1520;
+    --color-gw-bg4: #141C28;
+    --color-gw-sur: #182030;
+    --color-gw-sur2: #1E2A3C;
+    --color-gw-bdr: rgba(255,255,255,0.06);
+    --color-gw-bdr2: rgba(255,255,255,0.11);
+    --color-gw-text: #ECF0F6;
+    --color-gw-muted: #7A8CA0;
+    --color-gw-dim: #2E3D52;
+    --color-gw-accent: #F5C518;
+    --color-gw-accent2: #FF6B2B;
+    --color-gw-green: #22C55E;
+    --color-gw-blue: #3B82F6;
 }
 
 body {
-  font-family: var(--font-body);
+    font-family: var(--font-body);
 }
 
 .font-display { font-family: var(--font-display) !important; }
