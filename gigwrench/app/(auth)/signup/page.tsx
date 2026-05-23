@@ -49,7 +49,7 @@ const PW_CHECKS = [
   { key: 'upper',    labelKey: 'pw_upper',    test: (pw) => /[A-Z]/.test(pw) },
   { key: 'lower',    labelKey: 'pw_lower',    test: (pw) => /[a-z]/.test(pw) },
   { key: 'number',   labelKey: 'pw_number',   test: (pw) => /[0-9]/.test(pw) },
-  { key: 'special',  labelKey: 'pw_special',  test: (pw) => /[!@#$%^&*()_+-=[]{};':"\|,.<>/?\~]/.test(pw) },
+  { key: 'special',  labelKey: 'pw_special',  test: (pw) => /[!@#$%^&*()_+-=[]{};':"|,.<>/?\~]/.test(pw) },
   { key: 'common',   labelKey: 'pw_no_common',test: (pw) => !COMMON_PASSWORDS.has(pw.toLowerCase()) },
   { key: 'spaces',   labelKey: 'pw_no_spaces',test: (pw) => pw === pw.trim() },
 ]
@@ -62,7 +62,7 @@ function getStrength(pw) {
   if (/[A-Z]/.test(pw)) score++
   if (/[a-z]/.test(pw)) score++
   if (/[0-9]/.test(pw)) score++
-  if (/[!@#$%^&*()_+-=[]{};':"\|,.<>/?\~]/.test(pw)) score++
+  if (/[!@#$%^&*()_+-=[]{};':"|,.<>/?\~]/.test(pw)) score++
   if (!COMMON_PASSWORDS.has(pw.toLowerCase())) score++
   return Math.min(4, Math.floor(score / 1.75))
 }
