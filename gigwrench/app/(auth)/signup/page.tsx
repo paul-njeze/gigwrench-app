@@ -252,7 +252,7 @@ export default function SignupPage() {
                   <div className="flex gap-1 flex-1">
                     {[1,2,3,4].map(i => <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${strength >= i && strengthConfig ? strengthConfig.color : 'bg-white/10'}`}/>)}
                   </div>
-                  <span className={`font-mono text-[10px] uppercase tracking-wider ${strengthConfig?.color.replace('bg-', 'text-') || 'text-white/30'}`}>{ui[strengthConfig?.textKey] || ''}</span>
+                  <span className={`font-mono text-[10px] uppercase tracking-wider ${strengthConfig?.color.replace('bg-', 'text-') || 'text-white/30'}`}>{(ui as Record<string,string>)[strengthConfig?.textKey ?? ''] || ''}</span>
                 </div>
               )}
             </div>
@@ -268,7 +268,7 @@ export default function SignupPage() {
                       <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${passed ? 'bg-green-500/20 border border-green-500/40' : 'bg-white/5 border border-white/15'}`}>
                         {passed ? <Check size={9} className="text-green-400"/> : <div className="w-1 h-1 rounded-full bg-white/20"/>}
                       </div>
-                      <span className={`font-mono text-[11px] transition-colors duration-200 ${passed ? 'text-green-400' : 'text-white/40'}`}>{ui[labelKey]}</span>
+                      <span className={`font-mono text-[11px] transition-colors duration-200 ${passed ? 'text-green-400' : 'text-white/40'}`}>{(ui as Record<string,string>)[labelKey]}</span>
                     </div>
                   ))}
                   {confirm.length > 0 && (
