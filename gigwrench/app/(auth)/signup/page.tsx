@@ -45,13 +45,13 @@ const COMMON_PASSWORDS = new Set([
 ])
 
 const PW_CHECKS = [
-  { key: 'length',   labelKey: 'pw_length',   test: (pw) => pw.length >= 12 },
-  { key: 'upper',    labelKey: 'pw_upper',    test: (pw) => /[A-Z]/.test(pw) },
-  { key: 'lower',    labelKey: 'pw_lower',    test: (pw) => /[a-z]/.test(pw) },
-  { key: 'number',   labelKey: 'pw_number',   test: (pw) => /[0-9]/.test(pw) },
-  { key: 'special',  labelKey: 'pw_special',  test: (pw) => /[!@#$%^&*()_+\-=\[\]{};':"|,.<>/?~]/.test(pw) },
-  { key: 'common',   labelKey: 'pw_no_common',test: (pw) => !COMMON_PASSWORDS.has(pw.toLowerCase()) },
-  { key: 'spaces',   labelKey: 'pw_no_spaces',test: (pw) => pw === pw.trim() },
+  { key: 'length',   labelKey: 'pw_length',   test: (pw: string) => pw.length >= 12 },
+  { key: 'upper',    labelKey: 'pw_upper',    test: (pw: string) => /[A-Z]/.test(pw) },
+  { key: 'lower',    labelKey: 'pw_lower',    test: (pw: string) => /[a-z]/.test(pw) },
+  { key: 'number',   labelKey: 'pw_number',   test: (pw: string) => /[0-9]/.test(pw) },
+  { key: 'special',  labelKey: 'pw_special',  test: (pw: string) => /[!@#$%^&*()_+\-=\[\]{};':"|,.<>/?~]/.test(pw) },
+  { key: 'common',   labelKey: 'pw_no_common',test: (pw: string) => !COMMON_PASSWORDS.has(pw.toLowerCase()) },
+  { key: 'spaces',   labelKey: 'pw_no_spaces',test: (pw: string) => pw === pw.trim() },
 ]
 
 function getStrength(pw) {
