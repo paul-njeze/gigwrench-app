@@ -54,7 +54,7 @@ const PW_CHECKS = [
   { key: 'spaces',   labelKey: 'pw_no_spaces',test: (pw: string) => pw === pw.trim() },
 ]
 
-function getStrength(pw) {
+function getStrength(pw: string) {
   if (!pw) return 0
   let score = 0
   if (pw.length >= 12) score++
