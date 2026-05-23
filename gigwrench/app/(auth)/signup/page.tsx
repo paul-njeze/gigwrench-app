@@ -90,11 +90,11 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [agreedTerms, setAgreedTerms] = useState(false)
   const router = useRouter()
-  const ui = UI[lang] || UI.en
+  const ui = UI[lang as keyof typeof UI] || UI.en
 
   useEffect(() => {
     const saved = localStorage.getItem('gw_lang')
-    if (saved && UI[saved]) setLang(saved)
+    if (saved && UI[saved as keyof typeof UI]) setLang(saved)
   }, [])
 
   const pwResults = PW_CHECKS.map(c => ({ ...c, passed: c.test(password) }))
