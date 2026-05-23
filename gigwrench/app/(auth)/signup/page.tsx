@@ -118,7 +118,7 @@ export default function SignupPage() {
     if (err) { setError(ui.err_generic); setGoogleLoading(false) }
   }
 
-  async function handleSignup(e) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     if (!emailValid) { setError(ui.err_email); return }
