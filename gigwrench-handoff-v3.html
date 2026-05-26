@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GigWrench -- Claude Project Handoff v3</title>
+<style>
+*,::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090D;--bg2:#0B0F17;--bg3:#0F1520;--sur:#131C28;--sur2:#1A2535;
+  --bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.12);
+  --ac:#F5C518;--ac2:#FF6B2B;--green:#22C55E;--blue:#3B82F6;--red:#EF4444;
+  --txt:#ECF0F6;--tm:#7A8CA0;--td:#2E3D52;
+  --fd:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;--fm:'JetBrains Mono',monospace;
+}
+[data-theme="light"]{
+  --bg:#F8F6F0;--bg2:#FFFFFF;--bg3:#F0EDE6;--sur:#FFFFFF;--sur2:#F0EDE6;
+  --bdr:rgba(0,0,0,0.08);--bdr2:rgba(0,0,0,0.14);
+  --txt:#1C1A18;--tm:#6B6560;--td:#9A948E;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);font-size:15px;line-height:1.7;transition:background .3s,color .3s}
+a{color:var(--ac);text-decoration:none}
+a:hover{text-decoration:underline}
+.theme-bar{position:fixed;top:16px;right:16px;z-index:200;display:flex;gap:3px;background:var(--sur);border:1px solid var(--bdr2);border-radius:100px;padding:4px}
+.tb{background:transparent;border:none;padding:5px 11px;border-radius:100px;font-family:var(--fm);font-size:10px;color:var(--tm);cursor:pointer;transition:.2s;letter-spacing:.06em;text-transform:uppercase}
+.tb.on{background:var(--ac);color:#000;font-weight:600}
+.wrap{max-width:860px;margin:0 auto;padding:0 32px}
+.cover{padding:80px 0 60px;border-bottom:1px solid var(--bdr)}
+.cover-tag{font-family:var(--fm);font-size:11px;color:var(--ac);text-transform:uppercase;letter-spacing:.2em;margin-bottom:16px;display:block}
+.cover-h{font-family:var(--fd);font-size:clamp(64px,9vw,120px);letter-spacing:4px;line-height:.9;color:var(--txt);margin-bottom:6px}
+.cover-h em{color:var(--ac);font-style:normal}
+.cover-sub{font-size:18px;color:var(--tm);max-width:600px;margin:20px 0 32px;line-height:1.75}
+.stat-row{display:flex;gap:28px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;gap:3px}
+.stat-n{font-family:var(--fd);font-size:32px;letter-spacing:2px;color:var(--ac)}
+.stat-l{font-family:var(--fm);font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.1em}
+.badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:28px}
+.badge{font-family:var(--fm);font-size:10px;padding:3px 10px;border-radius:100px;border:1px solid var(--bdr2);color:var(--tm);text-transform:uppercase;letter-spacing:.06em}
+.badge.y{border-color:var(--ac);color:var(--ac);background:rgba(245,197,24,0.07)}
+.badge.g{border-color:var(--green);color:var(--green);background:rgba(34,197,94,0.07)}
+.badge.r{border-color:var(--red);color:var(--red);background:rgba(239,68,68,0.07)}
+.badge.b{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,0.07)}
+.sec{padding:52px 0;border-bottom:1px solid var(--bdr)}
+.sec-tag{font-family:var(--fm);font-size:10px;color:var(--ac);text-transform:uppercase;letter-spacing:.2em;display:block;margin-bottom:10px}
+.sec-h{font-family:var(--fd);font-size:clamp(32px,4vw,52px);letter-spacing:2px;line-height:1;color:var(--txt);margin-bottom:16px}
+p{color:var(--tm);margin-bottom:12px;max-width:720px}
+p strong{color:var(--txt);font-weight:500}
+.code-block{background:#000;border:1px solid var(--bdr2);border-radius:10px;overflow:hidden;margin:16px 0}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--bdr);background:var(--bg2)}
+.code-label{font-family:var(--fm);font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.1em}
+.copy-btn{font-family:var(--fm);font-size:10px;background:var(--sur2);border:1px solid var(--bdr2);color:var(--tm);padding:4px 10px;border-radius:6px;cursor:pointer;transition:.15s}
+.copy-btn:hover{background:var(--ac);color:#000;border-color:var(--ac)}
+pre{padding:20px;overflow-x:auto;font-family:var(--fm);font-size:12px;line-height:1.6;color:#E0E0E0;white-space:pre-wrap;word-break:break-word}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+th{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--td);padding:9px 12px;border-bottom:1px solid var(--bdr);text-align:left;background:var(--bg2)}
+td{padding:10px 12px;border-bottom:1px solid var(--bdr);color:var(--tm);vertical-align:top}
+td.key{font-family:var(--fm);font-size:11px;color:var(--ac);white-space:nowrap;width:220px}
+td.val{color:var(--txt);font-family:var(--fm);font-size:11px;word-break:break-all}
+tr:hover td{background:var(--sur)}
+.status-list{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.si{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;background:var(--sur);border:1px solid var(--bdr);border-radius:9px}
+.si-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.si-body{flex:1}
+.si-title{font-size:13px;font-weight:500;color:var(--txt);margin-bottom:2px}
+.si-desc{font-size:12px;color:var(--tm);line-height:1.5}
+.dot-g{background:var(--green)}
+.dot-y{background:var(--ac)}
+.dot-r{background:var(--red)}
+.dot-b{background:var(--blue)}
+.alert{padding:12px 16px;border-radius:9px;font-size:13px;line-height:1.6;margin:14px 0}
+.alert.y{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.22);color:var(--ac)}
+.alert.g{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.22);color:var(--green)}
+footer{padding:48px 0;text-align:center;border-top:1px solid var(--bdr)}
+.fl{font-family:var(--fd);font-size:28px;letter-spacing:4px;color:var(--txt)}
+.fl em{color:var(--ac);font-style:normal}
+.fs{font-family:var(--fm);font-size:10px;color:var(--td);margin-top:6px}
+@media(max-width:600px){.wrap{padding:0 16px}.cover-h{font-size:56px}}
+</style>
+</head>
+<body data-theme="dark">
+<div class="theme-bar">
+  <button class="tb on" onclick="setTheme('dark')">Dark</button>
+  <button class="tb" onclick="setTheme('light')">Light</button>
+  <button class="tb" onclick="setTheme('system')">Auto</button>
+</div>
+<div class="cover">
+<div class="wrap">
+  <span class="cover-tag">GigWrench -- Claude Project Handoff v3 -- May 2026</span>
+  <div class="cover-h">GIG<em>WRENCH</em></div>
+  <p class="cover-sub">Complete knowledge transfer document for Claude Projects. All builds, decisions, credentials, rules, and next steps. Zero knowledge gaps for a new Claude instance.</p>
+  <div class="stat-row">
+    <div class="stat"><span class="stat-n">v0.6</span><span class="stat-l">Current version</span></div>
+    <div class="stat"><span class="stat-n">6,500+</span><span class="stat-l">Lines of code</span></div>
+    <div class="stat"><span class="stat-n">20</span><span class="stat-l">Waitlist signups</span></div>
+    <div class="stat"><span class="stat-n">$14</span><span class="stat-l">Total spent</span></div>
+    <div class="stat"><span class="stat-n">240h</span><span class="stat-l">Hours invested</span></div>
+    <div class="stat"><span class="stat-n">18</span><span class="stat-l">House Rules</span></div>
+  </div>
+  <div class="badges">
+    <span class="badge y">Live at gigwrench.app</span>
+    <span class="badge g">App: gigwrench-app.vercel.app</span>
+    <span class="badge g">Build: Green (HRHMV2b3f)</span>
+    <span class="badge g">Google OAuth: Live</span>
+    <span class="badge g">Stripe: Installed</span>
+    <span class="badge b">Next: GigWrench Lens Phase 1</span>
+  </div>
+</div>
+</div>
+<div class="sec">
+<div class="wrap">
+  <span class="sec-tag">What Was Built This Session</span>
+  <h2 class="sec-h">Session 3 Completions.</h2>
+  <div class="status-list">
+    <div class="si"><div class="si-dot dot-g"></div><div class="si-body"><div class="si-title">v0.5 Jobs Page -- LIVE</div><div class="si-desc">Deployed at /jobs. Search, filter, grouped day view, quick actions (On My Way, Complete, Call Customer). Deployment AAG4LkFZr.</div></div></div>
+    <div class="si"><div class="si-dot dot-g"></div><div class="si-body"><div class="si-title">v0.6 Invoices List Page -- LIVE</div><div class="si-desc">Deployed at /invoices. Outstanding, Paid, Draft totals summary cards. Search and status filter pills. Deployment 39VWFAU2V.</div></div></div>
+    <div class="si"><div class="si-dot dot-g"></div><div class="si-body"><div class="si-title">v0.6 Create Invoice Page -- LIVE</div><div class="si-desc">Deployed at /invoices/new. Line items, description, customer email, due date, job linking, Save Draft and Send and Get Paid buttons. Stripe payment link generation wired to API route. Deployment HRHMV2b3f.</div></div></div>
+    <div class="si"><div class="si-dot dot-g"></div><div class="si-body"><div class="si-title">Stripe Payment Link API -- LIVE</div><div class="si-desc">Route at /api/invoices/create-payment-link. Uses stripe.prices.create then paymentLinks.create. Writes payment link URL back to invoices table in Supabase.</div></div></div>
+    <div class="si"><div class="si-dot dot-g"></div><div class="si-body"><div class="si-title">Google OAuth -- LIVE</div><div class="si-desc">Client ID: 53888560174-0ckino3uu92ji8iqmb1uvnocgqs8o7gv.apps.googleusercontent.com. Consent screen in testing mode. Add paul.njeze@gmail.com as test user to enable login.</div></div></div>
+    <div class="si"><div class="si-dot dot-g"></div><div class="si-body"><div class="si-title">Supabase Site URL -- Fixed</div><div class="si-desc">Was http://localhost:3000. Now https://gigwrench-app.vercel.app. Redirect URL added: https://gigwrench-app.vercel.app/auth/callback.</div></div></div>
+    <div class="si"><div class="si-dot dot-g"></div><div class="si-body"><div class="si-title">app.gigwrench.app Subdomain -- DNS Live</div><div class="si-desc">CNAME added in Namecheap (app -> 82f1b7499498a687.vercel-dns-017.com). Vercel showed SSL provisioning. Confirm it is live by visiting app.gigwrench.app.</div></div></div>
+    <div class="si"><div class="si-dot dot-y"></div><div class="si-body"><div class="si-title">GigWrench Lens Phase 1 -- NEXT TO BUILD</div><div class="si-desc">AI camera feature. Device camera capture, Claude vision API analysis, part identification, price range, supplier alternatives, one-tap add to invoice. API route: /api/lens/analyse. Components: gigwrench/components/lens/LensCapture.tsx and LensResult.tsx.</div></div></div>
+    <div class="si"><div class="si-dot dot-r"></div><div class="si-body"><div class="si-title">Stripe Webhook -- Pending</div><div class="si-desc">STRIPE_WEBHOOK_SECRET is set to PLACEHOLDER in Vercel env vars. Needs real webhook endpoint setup in Stripe dashboard and secret updated.</div></div></div>
+    <div class="si"><div class="si-dot dot-r"></div><div class="si-body"><div class="si-title">Google OAuth Consent Screen -- Testing Mode</div><div class="si-desc">Must publish before beta launch. Go to Google Cloud Console -> GigWrench project -> OAuth consent screen -> Publish App.</div></div></div>
+  </div>
+</div>
+</div>
+<div class="sec">
+<div class="wrap">
+  <span class="sec-tag">Infrastructure</span>
+  <h2 class="sec-h">Every Credential and URL.</h2>
+  <div class="alert y"><strong>Confidential.</strong> Do not share this document publicly.</div>
+  <table>
+    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td class="key">GitHub username</td><td class="val">paul-njeze</td></tr>
+      <tr><td class="key">App repo</td><td class="val">github.com/paul-njeze/gigwrench-app</td></tr>
+      <tr><td class="key">Landing repo</td><td class="val">github.com/paul-njeze/gigwrench-landing</td></tr>
+      <tr><td class="key">Supabase URL</td><td class="val">https://rlbvflqvkknhvuhehuif.supabase.co</td></tr>
+      <tr><td class="key">Supabase anon key</td><td class="val">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsYnZmbHF2a2tuaHZ1aGVodWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMjU1OTYsImV4cCI6MjA5NDcwMTU5Nn0.Qu_8Bx4F-qaw5xjslMwTCRm4xJBicZvvbNosPDJeFNA</td></tr>
+      <tr><td class="key">Vercel project</td><td class="val">gigwrench-app (Hobby plan), root: gigwrench, framework: Next.js</td></tr>
+      <tr><td class="key">Last green deployment</td><td class="val">HRHMV2b3f</td></tr>
+      <tr><td class="key">Live landing</td><td class="val">https://gigwrench.app</td></tr>
+      <tr><td class="key">Live app</td><td class="val">https://gigwrench-app.vercel.app</td></tr>
+      <tr><td class="key">App subdomain</td><td class="val">app.gigwrench.app (DNS live, confirm SSL)</td></tr>
+      <tr><td class="key">Google OAuth Client ID</td><td class="val">53888560174-0ckino3uu92ji8iqmb1uvnocgqs8o7gv.apps.googleusercontent.com</td></tr>
+      <tr><td class="key">Google OAuth Client Secret</td><td class="val">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</td></tr>
+      <tr><td class="key">Google Cloud Project ID</td><td class="val">gigwrench-497423</td></tr>
+      <tr><td class="key">Stripe package version</td><td class="val">^16.0.0 (installed in package.json)</td></tr>
+      <tr><td class="key">Stripe env vars in Vercel</td><td class="val">STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET (PLACEHOLDER)</td></tr>
+      <tr><td class="key">Formspree ID</td><td class="val">xaqknndd</td></tr>
+      <tr><td class="key">Primary domain</td><td class="val">gigwrench.app (Namecheap)</td></tr>
+      <tr><td class="key">DNS CNAME (www)</td><td class="val">b337856e9b481775.vercel-dns-017.com.</td></tr>
+      <tr><td class="key">DNS CNAME (app)</td><td class="val">82f1b7499498a687.vercel-dns-017.com.</td></tr>
+      <tr><td class="key">Total cash spent</td><td class="val">~$14 (domains only)</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+<div class="sec">
+<div class="wrap">
+  <span class="sec-tag">Pending Tasks</span>
+  <h2 class="sec-h">Next Steps In Order.</h2>
+  <table>
+    <thead><tr><th>Priority</th><th>Task</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="key">1 -- NEXT</td><td class="val">GigWrench Lens Phase 1</td><td class="val">Camera capture, Claude vision API, part analysis card, add to invoice. Files: /api/lens/analyse/route.ts, /components/lens/LensCapture.tsx, /components/lens/LensResult.tsx</td></tr>
+      <tr><td class="key">2</td><td class="val">v0.7 Customers CRM</td><td class="val">Customer list, add customer, job history per customer</td></tr>
+      <tr><td class="key">3</td><td class="val">v0.8 Live GPS tracking</td><td class="val">Supabase Realtime, tracking_sessions table already exists</td></tr>
+      <tr><td class="key">4</td><td class="val">Stripe webhook setup</td><td class="val">Update STRIPE_WEBHOOK_SECRET from PLACEHOLDER to real value</td></tr>
+      <tr><td class="key">5</td><td class="val">v0.9 AI translation layer</td><td class="val">Claude API translation on messages, invoices, reviews</td></tr>
+      <tr><td class="key">6</td><td class="val">v1.0 Loyalty engine</td><td class="val">Birthday greetings, thank-you notes, automated via Resend</td></tr>
+      <tr><td class="key">7</td><td class="val">v1.1 Reviews and marketplace</td><td class="val">Public Pro profiles, verified review flow</td></tr>
+      <tr><td class="key">8</td><td class="val">v1.2 Analytics dashboard</td><td class="val">Revenue charts, job completion rates, rating trends</td></tr>
+      <tr><td class="key">9</td><td class="val">Google OAuth publish</td><td class="val">Must publish consent screen before public beta</td></tr>
+      <tr><td class="key">10</td><td class="val">v1.3 Beta launch</td><td class="val">Onboard first 10 Pros, collect feedback</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+<div class="sec">
+<div class="wrap">
+  <span class="sec-tag">Investor Metrics</span>
+  <h2 class="sec-h">Current Numbers.</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td class="key">Launch date</td><td class="val">May 2026</td></tr>
+      <tr><td class="key">Waitlist signups</td><td class="val">20 (Day 1, $0 ad spend)</td></tr>
+      <tr><td class="key">MRR</td><td class="val">$0 (pre-revenue)</td></tr>
+      <tr><td class="key">Lines of code</td><td class="val">6,500+</td></tr>
+      <tr><td class="key">Build hours</td><td class="val">~240 total</td></tr>
+      <tr><td class="key">Cash spent</td><td class="val">~$14 (domains only)</td></tr>
+      <tr><td class="key">TAM</td><td class="val">40M+ solo tradespeople US, $500B+ global home services</td></tr>
+      <tr><td class="key">Gross margin target</td><td class="val">99% (API costs ~$9/mo at 300 users)</td></tr>
+      <tr><td class="key">Competitor pricing</td><td class="val">Thumbtack $300-500/mo, Angi $300+/mo, GigWrench $19/mo flat</td></tr>
+      <tr><td class="key">Key differentiator</td><td class="val">Only platform serving 32% Hispanic trades workforce in Spanish plus 9 other languages. GigWrench Lens (AI part scanner) has no competitor equivalent.</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+<div class="sec">
+<div class="wrap">
+  <span class="sec-tag">Claude Session Opener Prompt</span>
+  <h2 class="sec-h">Paste This to Start Any New Session.</h2>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-label">Opener Prompt v3 -- copy entire block</span>
+      <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+    </div>
+    <pre>You are my full-stack technical, business, and financial advisor. We are building GigWrench, an AI-powered two-sided marketplace and business OS for solo tradespeople. Think Uber meets Angi meets Jobber, with AI translation (10+ languages), live GPS tracking, automated loyalty engine, verified reviews, and neighborhood search by radius.
+
+TECH STACK: Next.js 15, Supabase (PostgreSQL + Auth + Realtime), Vercel Hobby, Stripe, Anthropic Claude API, Resend, Twilio, Tailwind CSS v4, TypeScript, Lucide React.
+
+CRITICAL TAILWIND NOTE: Uses Tailwind v4. globals.css uses @import "tailwindcss" and @theme {} for custom colors. Never use @tailwind base/components/utilities -- that is v3 syntax and breaks the build.
+
+INFRASTRUCTURE:
+
+- App repo: github.com/paul-njeze/gigwrench-app
+
+- Supabase URL: https://rlbvflqvkknhvuhehuif.supabase.co
+
+- Supabase anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsYnZmbHF2a2tuaHZ1aGVodWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMjU1OTYsImV4cCI6MjA5NDcwMTU5Nn0.Qu_8Bx4F-qaw5xjslMwTCRm4xJBicZvvbNosPDJeFNA
+
+- Vercel project: gigwrench-app, root directory: gigwrench, framework: Next.js
+
+- Live app: https://gigwrench-app.vercel.app
+
+- App subdomain: app.gigwrench.app (confirm SSL live)
+
+- Last green deployment: HRHMV2b3f
+
+- Stripe: installed (^16.0.0), env vars in Vercel (STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET=PLACEHOLDER)
+
+- Google OAuth: live, Client ID 53888560174-0ckino3uu92ji8iqmb1uvnocgqs8o7gv.apps.googleusercontent.com, testing mode
+
+VERSIONS SHIPPED:
+
+- v0.1 Landing page (gigwrench.app)
+
+- v0.2 Signup page (gigwrench.app/signup.html)
+
+- v0.3 App shell (Next.js + Supabase 12-table schema + dashboard)
+
+- v0.4 Auth pages (NIST signup + Google SSO + email verify + forgot-password)
+
+- v0.5 Jobs page (live at /jobs)
+
+- v0.6 Invoices list + create invoice + Stripe payment link API (live at /invoices and /invoices/new)
+
+IMMEDIATE NEXT TASK: Build GigWrench Lens Phase 1. AI camera feature: device camera capture, Claude API (claude-sonnet-4-20250514) vision analysis, part identification card showing name, use case, price range, alternatives, recommendation, one-tap add to invoice line item. Files to create: gigwrench/app/api/lens/analyse/route.ts, gigwrench/components/lens/LensCapture.tsx, gigwrench/components/lens/LensResult.tsx. Integrate the camera button into gigwrench/app/(dashboard)/invoices/new/page.tsx.
+
+PENDING AFTER LENS: v0.7 Customers CRM, v0.8 GPS tracking, Stripe webhook, v0.9 AI translation, v1.0 Loyalty, v1.1 Reviews/Marketplace, v1.2 Analytics, v1.3 Beta launch.
+
+HOUSE RULES (no exceptions):
+
+1. No em dashes. Use commas, periods, parentheses, or semicolons.
+
+2. End every reply with: PROGRESS: ~XX% BUILT / ~YY% REMAINING and CONTEXT: ~XXK / 200K (XX%) USED.
+
+3. ASCII arrows (->) only. No -- anywhere.
+
+4. Prose by default. Lists only when genuinely multi-item.
+
+5. All prompts go in a single fenced code block.
+
+6. Explicit mechanical steps for every operational action.
+
+7. Warn at 80% context, strong warning at 90%, rollover at 95%.
+
+8. Every prompt labeled with: PASTE INTO: [destination] at the top.
+
+9. Execute routine workflows end-to-end. Pause only for destructive actions.
+
+10. Flag flaws before user commits. Say no directly with reasoning.
+
+11. Track image uploads vs 100/chat limit and session usage % in bold at end of every reply.
+
+12. Track investor metrics every session.
+
+13. Always say Pros not Tradesmen anywhere.
+
+14. Dark/light/system theme toggle on every app page and HTML deliverable.
+
+15. Free tiers always first.
+
+16. All deliverables are separate labeled Chrome agent prompts. Code prompts reference file paths. SQL and browser tasks are always separate prompts. Destructive actions flagged first.
+
+17. Whenever options are presented, always follow with an explicit expert recommendation and rationale.
+
+18. Claude has perpetual approval to read github.com/paul-njeze/gigwrench-app at any time without asking.
+
+USER CONTEXT: Non-technical founder. Claude leads all technical execution. Chrome agent executes all browser tasks. Budget constrained, all free tiers.
+
+GITHUB TOKEN: TOKEN=
+
+Confirm you have read all of this. Then start building GigWrench Lens Phase 1.</pre>
+  </div>
+</div>
+</div>
+<footer>
+<div class="wrap">
+  <div class="fl">GIG<em>WRENCH</em></div>
+  <p class="fs">Claude Project Handoff v3 -- May 2026 -- Confidential -- 18 House Rules -- v0.6 Live -- Next: GigWrench Lens</p>
+</div>
+</footer>
+<script>
+function setTheme(t){
+  const actual=t==='system'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;
+  document.body.setAttribute('data-theme',actual);
+  document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b.textContent.toLowerCase()===t));
+  localStorage.setItem('gw_theme',t);
+}
+const saved=localStorage.getItem('gw_theme');
+if(saved)setTheme(saved);
+function copyBlock(btn){
+  const pre=btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='Copied!';
+    setTimeout(()=>btn.textContent='Copy',2000);
+  });
+}
+</script>
+</body>
+</html>
