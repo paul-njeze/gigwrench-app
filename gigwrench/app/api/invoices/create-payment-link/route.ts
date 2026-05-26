@@ -24,23 +24,19 @@ export async function POST(req: NextRequest) {
 
     }
 
+    const price = await stripe.prices.create({
+
+      currency: 'usd',
+
+      unit_amount: Math.round(amount * 100),
+
+      product_data: { name: description || 'GigWrench Invoice' },
+
+    })
+
     const paymentLink = await stripe.paymentLinks.create({
 
-      line_items: [{
-
-        price_data: {
-
-          currency: 'usd',
-
-          product_data: { name: description || 'GigWrench Invoice' },
-
-          unit_amount: Math.round(amount * 100),
-
-        },
-
-        quantity: 1,
-
-      }],
+      line_items: [{ price: price.id, quantity: 1 }],
 
       after_completion: {
 
