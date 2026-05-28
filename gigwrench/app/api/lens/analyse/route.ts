@@ -8,7 +8,7 @@ export interface LensResult {
   price_range: string
   suppliers: Array<{ name: string; reason: string }>
   recommendation: string
-}
+}h
 
 const SYSTEM_PROMPT =
   'You are an expert tradesperson parts identifier. ' +
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       : 'image/jpeg'
 
     const requestBody = {
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
       messages: [
