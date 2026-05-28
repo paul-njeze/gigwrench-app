@@ -8,7 +8,7 @@ export interface LensResult {
   price_range: string
   suppliers: Array<{ name: string; reason: string }>
   recommendation: string
-}h
+}
 
 const SYSTEM_PROMPT =
   'You are an expert tradesperson parts identifier. ' +
