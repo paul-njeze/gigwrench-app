@@ -6,8 +6,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LangProvider, useLang, LANGUAGES, type Language } from '@/lib/lang'
 import {
-  LayoutDashboard, Briefcase, FileText, Users, MessageSquare,
-  Settings, LogOut, ChevronDown, Menu, X, Wrench
+  LayoutDashboard, Briefcase, FileText, Users, MeshsageSquare,
+  CalendarCheck, Settings, LogOut, ChevronDown, Menu, X, Wrench
 } from 'lucide-react'
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
@@ -19,7 +19,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   const nav = [
     { href: '/dashboard', icon: LayoutDashboard, key: 'dashboard' },
     { href: '/jobs', icon: Briefcase, key: 'jobs' },
-    { href: '/invoices', icon: FileText, key: 'invoices' },
+    { href: '/dispatch', icon: CalendarCheck, key: 'dispatch' },    { href: '/invoices', icon: FileText, key: 'invoices' },
     { href: '/customers', icon: Users, key: 'customers' },
     { href: '/messages', icon: MessageSquare, key: 'messages' },
     { href: '/settings', icon: Settings, key: 'settings' },
