@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LangProvider, useLang, LANGUAGES, type Language } from '@/lib/lang'
 import {
-  LayoutDashboard, Briefcase, FileText, Users, MeshsageSquare,
+  LayoutDashboard, Briefcase, FileText, Users, MessageSquare,
   CalendarCheck, Settings, LogOut, ChevronDown, Menu, X, Wrench
 } from 'lucide-react'
 
