@@ -7,7 +7,7 @@
 <style>
 *,::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#07090D;--bg2:#0B0F17;--bg3:#0F1520;--sur:#131C28;--sur2:#1A2535;
+  --bg:#07090D;--bg2:#0B0F17;--bg3:#0F1520;--sur:h#131C28;--sur2:#1A2535;
   --bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.12);
   --ac:#F5C518;--ac2:#FF6B2B;--green:#22C55E;--blue:#3B82F6;--red:#EF4444;
   --txt:#ECF0F6;--tm:#7A8CA0;--td:#2E3D52;
@@ -248,7 +248,7 @@ VERSIONS SHIPPED:
 
 - v0.6 Invoices list + create invoice + Stripe payment link API (live at /invoices and /invoices/new)
 
-IMMEDIATE NEXT TASK: Build GigWrench Lens Phase 1. AI camera feature: device camera capture, Claude API (claude-sonnet-4-20250514) vision analysis, part identification card showing name, use case, price range, alternatives, recommendation, one-tap add to invoice line item. Files to create: gigwrench/app/api/lens/analyse/route.ts, gigwrench/components/lens/LensCapture.tsx, gigwrench/components/lens/LensResult.tsx. Integrate the camera button into gigwrench/app/(dashboard)/invoices/new/page.tsx.
+IMMEDIATE NEXT TASK: Build GigWrench Lens Phase 1. AI camera feature: device camera capture, Claude API (claude-sonnet-4-6) vision analysis, part identification card showing name, use case, price range, alternatives, recommendation, one-tap add to invoice line item. Files to create: gigwrench/app/api/lens/analyse/route.ts, gigwrench/components/lens/LensCapture.tsx, gigwrench/components/lens/LensResult.tsx. Integrate the camera button into gigwrench/app/(dashboard)/invoices/new/page.tsx.
 
 PENDING AFTER LENS: v0.7 Customers CRM, v0.8 GPS tracking, Stripe webhook, v0.9 AI translation, v1.0 Loyalty, v1.1 Reviews/Marketplace, v1.2 Analytics, v1.3 Beta launch.
 
