@@ -39,7 +39,7 @@ function SkeletonCard() {
                 <div className="h-4 w-40 bg-white/8 rounded mb-3"/>
                 <div className="h-3 w-full bg-white/5 rounded mb-2"/>
                 <div className="h-3 w-3/4 bg-white/5 rounded"/>
-          </div>div>
+          </div>
         )
 }
 
@@ -89,21 +89,21 @@ export default function DispatchPage() {
           <div className="min-h-screen bg-[#07090D] px-4 py-8 lg:px-8">
                 <div className="max-w-2xl mx-auto">
                         <div className="mb-8">
-                                  <h1 className="font-mono text-2xl uppercase tracking-widest text-white mb-2">Dispatch Inbox</h1>h1>
-                                  <p className="text-white/40 text-sm">Dispatch manages your bookings automatically. Review and act on requests below.</p>p>
-                        </div>div>
+                                  <h1 className="font-mono text-2xl uppercase tracking-widest text-white mb-2">Dispatch Inbox</h1>
+                                  <p className="text-white/40 text-sm">Dispatch manages your bookings automatically. Review and act on requests below.</p>
+                        </div>
                   {loading && (
                       <div className="flex flex-col gap-3">
                                   <SkeletonCard/><SkeletonCard/><SkeletonCard/>
-                      </div>div>
+                      </div>
                         )}
                   {!loading && error && (
-                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">{error}</div>div>
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">{error}
                         )}
                   {!loading && !error && requests.length === 0 && (
                       <div className="bg-[#0B0F17] border border-white/6 rounded-xl p-8 text-center">
-                                  <p className="text-white/30 text-sm">No booking requests yet. Share your GigWrench profile link to start receiving requests through Dispatch.</p>p>
-                      </div>div>
+                                  <p className="text-white/30 text-sm">No booking requests yet. Share your GigWrench profile link to start receiving requests through Dispatch.</p>
+                      </div>
                         )}
                   {!loading && !error && requests.length > 0 && (
                       <div className="flex flex-col gap-3">
@@ -114,14 +114,14 @@ export default function DispatchPage() {
                                                                                       return (
                                                                                                         <div key={req.id} className="bg-[#0B0F17] border border-white/6 rounded-xl p-5 transition-all">
                                                                                                                           <div className="flex items-start justify-between gap-3 mb-2">
-                                                                                                                                              <span className="font-mono text-sm text-white font-medium">{req.customer_name}</span>span>
+                                                                                                                                              <span className="font-mono text-sm text-white font-medium">{req.customer_name}</span>
                                                                                                                                               <span className={`font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full flex-shrink-0 ${statusClass}`}>
                                                                                                                                                 {status.replace('_', ' ')}
-                                                                                                                                                </span>span>
-                                                                                                                            </div>div>
-                                                                                                                          <p className="text-white/50 text-sm mb-3 leading-relaxed">{req.job_description}</p>p>
+                                                                                                                                                </span>
+                                                                                                                            </div>
+                                                                                                                          <p className="text-white/50 text-sm mb-3 leading-relaxed">{req.job_description}</p>
                                                                                                           {req.dispatch_slot_offered && (
-                                                                                                                              <p className="font-mono text-xs text-white/30 mb-3">Slot offered: {formatSlot(req.dispatch_slot_offered)}</p>p>
+                                                                                                                              <p className="font-mono text-xs text-white/30 mb-3">Slot offered: {formatSlot(req.dispatch_slot_offered)}</p>
                                                                                                                           )}
                                                                                                           {canAct && (
                                                                                                                               <div className="flex gap-2 mt-3">
@@ -129,20 +129,20 @@ export default function DispatchPage() {
                                                                                                                                                                               onClick={() => handleAction('BOOK', req.id)}
                                                                                                                                                                               disabled={!!optimistic[req.id]}
                                                                                                                                                                               className="flex-1 bg-yellow-400/10 hover:bg-yellow-400/20 border border-yellow-400/25 text-yellow-400 font-mono text-xs uppercase tracking-widest px-3 py-2 rounded-lg transition-all disabled:opacity-40"
-                                                                                                                                                                            >Book</button>button>
+                                                                                                                                                                            >Book</button>
                                                                                                                                                     <button
                                                                                                                                                                               onClick={() => handleAction('DECLINE', req.id)}
                                                                                                                                                                               disabled={!!optimistic[req.id]}
                                                                                                                                                                               className="flex-1 bg-red-500/8 hover:bg-red-500/15 border border-red-500/20 text-red-400 font-mono text-xs uppercase tracking-widest px-3 py-2 rounded-lg transition-all disabled:opacity-40"
-                                                                                                                                                                            >Decline</button>button>
-                                                                                                                                </div>div>
+                                                                                                                                                                            >Decline</button>
+                                                                                                                                </div>
                                                                                                                           )}
-                                                                                                          </div>div>
+                                                                                                          </div>
                                                                                                       )
                         })}
-                      </div>div>
+                      </div>
                         )}
-                </div>div>
-          </div>div>
+                </div>
+          </div>
         )
-}</div>
+}
