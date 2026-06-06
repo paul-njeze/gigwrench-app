@@ -98,7 +98,7 @@ export default function DispatchPage() {
                       </div>
                         )}
                   {!loading && error && (
-                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">{error}
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">{error}</div>
                         )}
                   {!loading && !error && requests.length === 0 && (
                       <div className="bg-[#0B0F17] border border-white/6 rounded-xl p-8 text-center">
