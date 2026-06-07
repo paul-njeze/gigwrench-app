@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 
 import { useLang } from '@/lib/lang'
 
-import Link from 'next/link'
+import Link from 'next/link'h
+import LocationBroadcaster from '@/components/gps/LocationBroadcaster'
 
 import {
 
@@ -365,10 +366,11 @@ export default function JobsPage() {
                       </div>
 
                     )}
+                    {(job.status === 'confirmed' || job.status === 'in_progress') && (
+                                      <LocationBroadcaster jobId={job.id} jobTitle={job.title} />
+                                    )}
 
                   </Link>
-
-                ))}
 
               </div>
 
