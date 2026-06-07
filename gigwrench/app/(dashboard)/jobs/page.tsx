@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 
 import { useLang } from '@/lib/lang'
 
-import Link from 'next/link'h
+import Link from 'next/link'
 import LocationBroadcaster from '@/components/gps/LocationBroadcaster'
 
 import {
