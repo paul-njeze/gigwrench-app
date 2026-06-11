@@ -43,6 +43,14 @@ export default function LocationBroadcaster({ jobId, jobTitle }: Props) {
     }
   }, [jobId])
 
+  const stopBroadcasting = useCallback(() => {
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current)
+      watchIdRef.current = null
+    }
+    setActive(false)
+  }, [])
+
   const startBroadcasting = useCallback(() => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser.')
@@ -66,14 +74,6 @@ export default function LocationBroadcaster({ jobId, jobTitle }: Props) {
     watchIdRef.current = watchId
     setActive(true)
   }, [postLocation])
-
-  const stopBroadcasting = useCallback(() => {
-    if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current)
-      watchIdRef.current = null
-    }
-    setActive(false)
-  }, [])
 
   const handleToggle = () => {
     if (active) {
