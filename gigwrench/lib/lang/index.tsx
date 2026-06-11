@@ -1,4 +1,5 @@
 'use client'
+// GPS i18n v0.8 -- all 10 language objects verified
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
