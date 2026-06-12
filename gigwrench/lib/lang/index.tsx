@@ -99,7 +99,7 @@ interface LangContextType {
 }
 
 const LangContext = createContext<LangContextType>({
-  lang: ', bookWithPro: '[Pro का नाम] के साथ बुक करें', describeYourProblem: 'अपनी समस्या बताएं', addVisualEvidence: 'फोटो या वॉयस नोट जोड़ें', confirmScope: 'काम का दायरा पुष्टि करें', chooseATime: 'समय चुनें', termsAndDeposit: 'शर्तें देखें और भुगतान करें', bookingConfirmed: 'बुकिंग पुष्टि हो गई', dispatchIsThinking: 'Dispatch सोच रहा है...', confirmAndPay: 'पुष्टि करें और $50 दें', transferNotice: 'आपकी बुकिंग नए Pro को स्थानांतरित की गई'en',
+  lang: 'en',
   setLang: () => {},
   t: (k) => k,
 })
