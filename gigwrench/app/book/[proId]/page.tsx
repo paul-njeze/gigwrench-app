@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { CheckCircle, MapPin, Upload, Mic, Camera, Copy, Check } from 'lucide-react'
+import { MapPin, Copy, Check } from 'lucide-react'
 
 type Stage = 1 | 2 | 3 | 4 | 5 | 6
 
@@ -457,7 +457,7 @@ export default function BookPage() {
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full min-h-[64px] flex items-center gap-4 px-6 rounded-xl bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm font-medium"
               >
-                <Camera className="w-6 h-6 text-[var(--color-gw-accent)]" />
+                <span className="text-xl">📷</span>
                 Take Photos with Lens
               </button>
               <input
@@ -484,7 +484,7 @@ export default function BookPage() {
                 }}
                 className="w-full min-h-[64px] flex items-center gap-4 px-6 rounded-xl bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm font-medium"
               >
-                <Upload className="w-6 h-6 text-[var(--color-gw-accent)]" />
+                <span className="text-xl">📤</span>
                 Upload Photos
               </button>
 
@@ -492,7 +492,7 @@ export default function BookPage() {
                 onClick={handleVoiceRecord}
                 className={`w-full min-h-[64px] flex items-center gap-4 px-6 rounded-xl border text-sm font-medium ${isRecording ? 'bg-red-900 border-red-500' : 'bg-[var(--color-gw-sur)] border-[var(--color-gw-bdr)]'}`}
               >
-                <Mic className="w-6 h-6 text-[var(--color-gw-accent)]" />
+                <span className="text-xl">🎙️</span>
                 {isRecording ? 'Recording... tap to stop' : 'Record a Voice Note (max 2 min)'}
               </button>
             </div>
@@ -627,7 +627,7 @@ export default function BookPage() {
         {/* STAGE 6: CONFIRMATION */}
         {stage === 6 && (
           <div className="flex flex-col items-center py-12 text-center">
-            <CheckCircle className="w-16 h-16 text-[var(--color-gw-green)] mb-6" />
+            <div className="w-16 h-16 rounded-full bg-[var(--color-gw-green)] flex items-center justify-center text-white text-3xl mb-6">✓</div>
             <h2 className="text-2xl font-bold mb-2">Your booking is confirmed</h2>
             <p className="text-[var(--color-gw-muted)] text-sm mb-1">
               with {proProfile?.full_name ?? 'your Pro'}
