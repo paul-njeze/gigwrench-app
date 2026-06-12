@@ -357,7 +357,19 @@ export default function JobsPage() {
 
                         </button>
 
-                        <button onClick={e => e.preventDefault()} className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 text-green-400 px-3 py-1.5 rounded-lg font-mono text-[10px] uppercase tracking-wider hover:bg-green-500/15 transition-colors ml-auto">
+                        <button onClick={async e => {
+          e.preventDefault()
+          e.stopPropagation()
+          const supabase = createClient()
+          const { data: { user } } = await supabase.auth.getUser()
+          if (!user) return
+          await fetch('/api/loyalty/job-complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ job_id: job.id }),
+          })
+          setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'completed' } : j))
+        }} className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 text-green-400 px-3 py-1.5 rounded-lg font-mono text-[10px] uppercase tracking-wider hover:bg-green-500/15 transition-colors ml-auto">
 
                           <CheckCircle2 size={10}/>{t('job_complete')}
 
