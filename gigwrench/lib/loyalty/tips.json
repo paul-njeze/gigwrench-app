@@ -1,0 +1,314 @@
+{
+  "categories": {
+    "plumbing": {
+      "label": "Plumbing",
+      "tips": [
+        {
+          "title": "Check under your sink monthly",
+          "body": "A slow drip under the sink can cause mold in days. Put a dry paper towel under pipes overnight -- if it is damp in the morning, call your Pro."
+        },
+        {
+          "title": "Know where your main shutoff is",
+          "body": "If a pipe bursts you have seconds, not minutes. Walk your home now and find the main water shutoff valve. Mark it with a piece of tape."
+        },
+        {
+          "title": "Hot water heater maintenance",
+          "body": "Flush your water heater tank once a year to remove sediment. Sediment buildup reduces efficiency and shortens the heater lifespan by years."
+        },
+        {
+          "title": "Fix running toilets fast",
+          "body": "A running toilet wastes up to 200 gallons of water per day. The fix is usually a $5 flapper valve. Jiggling the handle is not a fix."
+        },
+        {
+          "title": "Low water pressure diagnosis",
+          "body": "Low pressure in one fixture usually means a clogged aerator -- unscrew the tap nozzle and rinse it. Low pressure everywhere means call your Pro."
+        }
+      ]
+    },
+    "electrical": {
+      "label": "Electrical",
+      "tips": [
+        {
+          "title": "Test your GFCI outlets quarterly",
+          "body": "The outlets with Test and Reset buttons in bathrooms and kitchens protect you from electric shock. Press Test -- the outlet should go dead. Press Reset to restore. If it does not work, replace it."
+        },
+        {
+          "title": "Do not overload power strips",
+          "body": "Power strips are for laptops and lamps, not appliances. Microwaves, heaters, and fridges need their own dedicated wall outlet."
+        },
+        {
+          "title": "Flickering lights mean a connection problem",
+          "body": "Occasional flickering is usually a bulb. Frequent flickering on multiple lights is a loose connection in your panel -- do not ignore it."
+        },
+        {
+          "title": "Check your breaker panel yearly",
+          "body": "Look for breakers that feel warm, smell burnt, or have visible rust. Any of these is a professional call, not a DIY job."
+        },
+        {
+          "title": "Outdoor outlets need weatherproof covers",
+          "body": "If your outdoor outlets do not have spring-loaded covers, replace the cover plate. Water and electricity are a dangerous combination."
+        }
+      ]
+    },
+    "hvac": {
+      "label": "HVAC",
+      "tips": [
+        {
+          "title": "Change your air filter every 90 days",
+          "body": "A clogged filter makes your HVAC work harder, raises your energy bill, and reduces air quality. Mark your calendar right now."
+        },
+        {
+          "title": "Clean your AC condenser coils annually",
+          "body": "The outdoor unit collects leaves and debris. Turn off power at the disconnect box, then gently rinse the fins with a garden hose from the inside out."
+        },
+        {
+          "title": "Bleed your radiators in autumn",
+          "body": "Trapped air in radiators means uneven heat and higher bills. Use a radiator key to open the bleed valve until water drips out, then close it."
+        },
+        {
+          "title": "Seal gaps around ductwork",
+          "body": "Leaky ducts can waste 20-30% of your heating and cooling. Use foil tape (not regular duct tape) to seal visible joints in accessible areas."
+        },
+        {
+          "title": "Keep vents unblocked",
+          "body": "Furniture pushed against vents forces your system to overwork. Leave at least 12 inches of clearance around every supply and return vent."
+        }
+      ]
+    },
+    "carpentry": {
+      "label": "Carpentry",
+      "tips": [
+        {
+          "title": "Fix squeaky floors with talcum powder",
+          "body": "Sprinkle talcum powder over a squeaky hardwood floor and work it into the cracks with a soft cloth. It lubricates the boards without any nails or tools."
+        },
+        {
+          "title": "Doors sticking in summer",
+          "body": "Wood expands in humidity. A sticking door in summer usually self-corrects in winter. If it sticks year-round, the frame may have shifted -- call your Pro."
+        },
+        {
+          "title": "Fill small wall holes properly",
+          "body": "Toothpaste and soap are temporary. Use spackle for holes under 1 inch. Feather the edges smooth and prime before painting or the patch will show."
+        },
+        {
+          "title": "Re-caulk your bathroom yearly",
+          "body": "Cracked caulk around tubs and showers lets water into the wall. Strip the old caulk completely, dry the surface for 24 hours, then apply a fresh bead."
+        },
+        {
+          "title": "Check deck boards for rot annually",
+          "body": "Poke deck boards with a screwdriver. Soft spots mean rot has started. A single rotted board caught early is a one-hour fix. Ignored for a season it can compromise the whole structure."
+        }
+      ]
+    },
+    "cleaning": {
+      "label": "Cleaning",
+      "tips": [
+        {
+          "title": "Clean your dryer vent annually",
+          "body": "Lint in the dryer vent is a leading cause of house fires. Disconnect the vent hose and use a long brush to clear the full run to the outside."
+        },
+        {
+          "title": "Descale your shower head monthly",
+          "body": "Fill a plastic bag with white vinegar, tie it over the shower head overnight. In the morning the mineral deposits dissolve and pressure returns."
+        },
+        {
+          "title": "Clean refrigerator coils twice a year",
+          "body": "Dusty coils at the back or bottom of your fridge make the compressor work harder and shorten its life. Vacuum them with a brush attachment."
+        },
+        {
+          "title": "Deep clean kitchen exhaust filters",
+          "body": "Mesh filters above your stove trap grease. Soak them in hot water with dish soap and baking soda for 30 minutes, then scrub and rinse."
+        },
+        {
+          "title": "Sanitize your garbage disposal",
+          "body": "Cut a lemon in half and run both halves through the disposal followed by a cup of ice and a handful of coarse salt. Eliminates odor without chemicals."
+        }
+      ]
+    },
+    "painting": {
+      "label": "Painting",
+      "tips": [
+        {
+          "title": "Always cut in before rolling",
+          "body": "Use a 2-inch angled brush to paint a 3-inch band along edges, corners, and trim before rolling. This prevents lap marks and gives clean lines."
+        },
+        {
+          "title": "Do not skip primer on dark walls",
+          "body": "Painting a light color over a dark wall without primer will need 4 or more coats. One coat of primer cuts that to two. Always prime."
+        },
+        {
+          "title": "Fix nail pops before repainting",
+          "body": "Nail pops push through paint over time. Drive a new screw 2 inches from the pop, countersink the nail, fill with spackle, sand flush, then paint."
+        },
+        {
+          "title": "Store leftover paint correctly",
+          "body": "Press a piece of plastic wrap against the paint surface before replacing the lid to prevent a skin from forming. Store upside down in a temperature-stable room."
+        },
+        {
+          "title": "Test your colour in natural light",
+          "body": "Paint a 12-inch square patch on the actual wall and observe it at different times of day before committing. Colour chips in a store look nothing like paint on a wall."
+        }
+      ]
+    },
+    "landscaping": {
+      "label": "Landscaping",
+      "tips": [
+        {
+          "title": "Water deeply, not frequently",
+          "body": "Shallow daily watering trains roots to stay near the surface. Water deeply twice a week so roots grow deep and your lawn becomes drought-resistant."
+        },
+        {
+          "title": "Mow high in summer",
+          "body": "Set your mower to cut at 3-4 inches in summer heat. Taller grass shades the soil, retains moisture, and crowds out weeds."
+        },
+        {
+          "title": "Dethatch your lawn in autumn",
+          "body": "A layer of dead grass and roots over half an inch thick blocks water and nutrients. Rent a dethatcher or use a stiff rake before the first frost."
+        },
+        {
+          "title": "Blow out irrigation lines before winter",
+          "body": "Water left in irrigation lines freezes and cracks the pipes. Connect an air compressor to blow out each zone before temperatures drop below freezing."
+        },
+        {
+          "title": "Mulch garden beds in spring",
+          "body": "A 2-3 inch layer of mulch around plants suppresses weeds, retains moisture, and regulates soil temperature. Keep mulch 2 inches away from plant stems."
+        }
+      ]
+    },
+    "security": {
+      "label": "Security",
+      "tips": [
+        {
+          "title": "Test smoke detectors monthly",
+          "body": "Press and hold the test button on every smoke detector. Replace batteries annually even if the detector still works. Replace the whole unit every 10 years."
+        },
+        {
+          "title": "Rekey locks when you move in",
+          "body": "You never know how many copies of the previous owner's keys exist. Rekeying costs $20 per lock at a hardware store and is worth every cent."
+        },
+        {
+          "title": "Check exterior door frames for rot",
+          "body": "A strong deadbolt means nothing if the door frame is rotted. Push firmly on your exterior door frames. Soft or spongy wood needs replacement before winter."
+        },
+        {
+          "title": "Keep your garage code private",
+          "body": "Change your garage door code annually and never write it on the remote. A garage is often the easiest entry point into a home."
+        },
+        {
+          "title": "Install door reinforcement plates",
+          "body": "Most forced entries happen at the door frame, not the lock. A $15 steel strike plate with 3-inch screws into the stud makes kick-in attacks dramatically harder."
+        }
+      ]
+    }
+  },
+  "country_top10": {
+    "US": [
+      "plumbing",
+      "electrical",
+      "hvac",
+      "carpentry",
+      "cleaning",
+      "painting",
+      "landscaping",
+      "security",
+      "plumbing",
+      "electrical"
+    ],
+    "GB": [
+      "plumbing",
+      "electrical",
+      "carpentry",
+      "hvac",
+      "cleaning",
+      "painting",
+      "landscaping",
+      "security",
+      "plumbing",
+      "electrical"
+    ],
+    "CA": [
+      "plumbing",
+      "hvac",
+      "electrical",
+      "carpentry",
+      "cleaning",
+      "painting",
+      "landscaping",
+      "security",
+      "plumbing",
+      "electrical"
+    ],
+    "AU": [
+      "electrical",
+      "plumbing",
+      "cleaning",
+      "carpentry",
+      "painting",
+      "landscaping",
+      "hvac",
+      "security",
+      "plumbing",
+      "electrical"
+    ],
+    "MX": [
+      "plumbing",
+      "electrical",
+      "carpentry",
+      "painting",
+      "cleaning",
+      "hvac",
+      "landscaping",
+      "security",
+      "plumbing",
+      "electrical"
+    ],
+    "BR": [
+      "electrical",
+      "plumbing",
+      "carpentry",
+      "painting",
+      "cleaning",
+      "landscaping",
+      "hvac",
+      "security",
+      "plumbing",
+      "electrical"
+    ],
+    "PH": [
+      "electrical",
+      "plumbing",
+      "carpentry",
+      "cleaning",
+      "painting",
+      "landscaping",
+      "hvac",
+      "security",
+      "plumbing",
+      "electrical"
+    ],
+    "IN": [
+      "electrical",
+      "plumbing",
+      "carpentry",
+      "painting",
+      "cleaning",
+      "landscaping",
+      "hvac",
+      "security",
+      "plumbing",
+      "electrical"
+    ],
+    "DEFAULT": [
+      "plumbing",
+      "electrical",
+      "hvac",
+      "carpentry",
+      "cleaning",
+      "painting",
+      "landscaping",
+      "security",
+      "plumbing",
+      "electrical"
+    ]
+  }
+}
