@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
                   job_description: string
                   preferred_date?: string
                   estimated_duration_hours?: number
+                  sms_consent?: boolean
+                  sms_consent_timestamp?: string
           }
 
       const { pro_id, customer_name, customer_email, job_description } = body
@@ -45,6 +47,8 @@ export async function POST(req: NextRequest) {
                       preferred_date: body.preferred_date ?? null,
                       estimated_duration_hours: body.estimated_duration_hours ?? 2,
                       status: "pending",
+                      sms_consent: body.sms_consent ?? false,
+                      sms_consent_timestamp: body.sms_consent_timestamp ?? null,
             })
             .select("id")
             .single()
