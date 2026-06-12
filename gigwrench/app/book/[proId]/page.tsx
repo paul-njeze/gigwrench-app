@@ -440,7 +440,7 @@ export default function BookPage() {
                 onClick={() => advanceStage(2)}
                 className="w-full mt-4 min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm"
               >
-                Continue to Evidence ->
+                Continue to Evidence {'->'}
               </button>
             )}
           </div>
@@ -515,7 +515,7 @@ export default function BookPage() {
               disabled={attachments.length === 0}
               className="w-full min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm disabled:opacity-40"
             >
-              Continue to Scope ->
+              Continue to Scope {'->'}
             </button>
           </div>
         )}
@@ -542,7 +542,7 @@ export default function BookPage() {
               disabled={generatingSummary || !editableSummary.trim()}
               className="w-full min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm disabled:opacity-40"
             >
-              Looks right ->
+              Looks right {'->'}
             </button>
           </div>
         )}
@@ -581,7 +581,7 @@ export default function BookPage() {
               disabled={!selectedSlot}
               className="w-full min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm disabled:opacity-40"
             >
-              Continue ->
+              Continue {'->'}
             </button>
           </div>
         )}
