@@ -96,7 +96,7 @@ export default function LocationBroadcaster({ jobId, jobTitle }: Props) {
   return (
     <div className="mt-3 pt-3 border-t border-white/5">
       <button
-        onClick={handleToggle}
+        onClick={(e) => { e.stopPropagation(); handleToggle(); }}
         className={[
           'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-mono transition-all w-full justify-center',
           active
