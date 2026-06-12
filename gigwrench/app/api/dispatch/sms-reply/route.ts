@@ -128,7 +128,88 @@ export async function POST(req: NextRequest) {
                         }),
               }).catch(() => {})
 
+      } else if (command === "ACCEPT") {
+        // Check for pending work_order_transfer for this customer's booking
+        const { data: pendingTransfer } = await supabase
+          .from("work_order_transfers")
+          .select("id, booking_request_id, original_pro_id, receiving_pro_id")
+          .eq("booking_request_id", bookingId)
+          .eq("status", "pending_customer_consent")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single()
+
+        if (pendingTransfer) {
+          await supabase
+            .from("work_order_transfers")
+            .update({ status: "customer_accepted", customer_responded_at: new Date().toISOString() })
+            .eq("id", pendingTransfer.id)
+
+          await supabase
+            .from("booking_requests")
+            .update({ pro_id: pendingTransfer.receiving_pro_id })
+            .eq("id", pendingTransfer.booking_request_id)
+
+          const { data: newPro } = await supabase
+            .from("profiles")
+            .select("phone")
+            .eq("id", pendingTransfer.receiving_pro_id)
+            .single()
+
+          const { data: origPro } = await supabase
+            .from("profiles")
+            .select("phone")
+            .eq("id", pendingTransfer.original_pro_id)
+            .single()
+
+          if (newPro?.phone) {
+            await sendTwilioSMS(newPro.phone, `The customer has accepted the transfer. The work order is now yours. -- Dispatch, your GigWrench AI`)
+          }
+          if (origPro?.phone) {
+            await sendTwilioSMS(origPro.phone, `Transfer accepted. You are released from this booking. -- Dispatch, your GigWrench AI`)
+          }
+        }
+
       } else if (command === "DECLINE") {
+        // Check if there is a pending work_order_transfer for this customer first
+        const { data: pendingDeclineTransfer } = await supabase
+          .from("work_order_transfers")
+          .select("id, booking_request_id, original_pro_id, receiving_pro_id")
+          .eq("booking_request_id", bookingId)
+          .eq("status", "pending_customer_consent")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single()
+
+        if (pendingDeclineTransfer) {
+          await supabase
+            .from("work_order_transfers")
+            .update({ status: "customer_declined", customer_responded_at: new Date().toISOString() })
+            .eq("id", pendingDeclineTransfer.id)
+
+          const { data: depositHold } = await supabase
+            .from("deposit_holds")
+            .select("stripe_payment_intent_id")
+            .eq("booking_request_id", pendingDeclineTransfer.booking_request_id)
+            .eq("status", "held")
+            .single()
+
+          if (depositHold?.stripe_payment_intent_id) {
+            await fetch("https://api.stripe.com/v1/refunds", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({ payment_intent: depositHold.stripe_payment_intent_id }).toString(),
+            })
+            await supabase.from("deposit_holds").update({ status: "refunded" }).eq("booking_request_id", pendingDeclineTransfer.booking_request_id)
+          }
+
+          await supabase.from("booking_requests").update({ status: "cancelled" }).eq("id", pendingDeclineTransfer.booking_request_id)
+
+          await sendTwilioSMS(booking.customer_phone, `Your booking has been cancelled and a full refund is on its way. -- Dispatch, your GigWrench AI`)
+        } else {
               await supabase
                 .from("booking_requests")
                 .update({ status: "declined" })
@@ -138,6 +219,7 @@ export async function POST(req: NextRequest) {
                     booking.customer_phone,
                     `We're sorry -- ${proName} is not available for your requested time. Search for other Pros at gigwrench.app. -- Dispatch, your GigWrench AI`
                   )
+        }
 
       } else if (command === "RESCHEDULE") {
               await sendTwilioSMS(
