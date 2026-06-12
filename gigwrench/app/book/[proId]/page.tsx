@@ -56,6 +56,7 @@ export default function BookPage() {
   const [customerName, setCustomerName] = useState('')
   const [customerEmail, setCustomerEmail] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
+  const [smsConsent, setSmsConsent] = useState(false)
   const [stage1Done, setStage1Done] = useState(false)
   const conversationEndRef = useRef<HTMLDivElement | null>(null)
 
@@ -101,6 +102,8 @@ export default function BookPage() {
             customer_email: customerEmail,
             customer_phone: customerPhone,
             job_description: customerMessage,
+            sms_consent: smsConsent,
+            sms_consent_timestamp: new Date().toISOString(),
           }),
         })
         const data = await res.json() as { booking_request_id?: string }
@@ -396,6 +399,19 @@ export default function BookPage() {
               </div>
             )}
 
+            {/* SMS Consent Checkbox */}
+            <label className="flex items-start gap-3 mt-4 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={smsConsent}
+                onChange={(e) => setSmsConsent(e.target.checked)}
+                className="mt-1 w-4 h-4 accent-[var(--color-gw-accent)] flex-shrink-0"
+              />
+              <span className="text-sm text-[var(--color-gw-muted)] leading-snug">
+                I agree to receive SMS messages from GigWrench Dispatch regarding my booking, including appointment confirmations, reminders, and status updates. Message frequency varies. Message and data rates may apply. Reply STOP to unsubscribe at any time. Reply HELP for help.
+              </span>
+            </label>
+
             {/* Conversation */}
             <div className="space-y-3 mb-4">
               {conversationHistory.map((turn, i) => (
@@ -439,6 +455,7 @@ export default function BookPage() {
               <button
                 onClick={() => advanceStage(2)}
                 className="w-full mt-4 min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm"
+                disabled={!smsConsent || !customerName || !customerMessage}
               >
                 Continue to Evidence {'->'}
               </button>
