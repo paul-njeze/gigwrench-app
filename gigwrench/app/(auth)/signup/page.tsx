@@ -12,21 +12,25 @@ const LANGS = [
   { code: 'pt', flag: '🇵🇹', label: 'Português' },
   { code: 'fr', flag: '🇫🇷', label: 'Français' },
   { code: 'pl', flag: '🇵🇱', label: 'Polski' },
+  { code: 'tl', flag: '🇵🇭', label: 'Tagalog' },
   { code: 'ar', flag: '🇸🇦', label: 'العربية' },
+  { code: 'ru', flag: '🇷🇺', label: 'Русский' },
+  { code: 'zh', flag: '🇨🇳', label: '中文' },
+  { code: 'hi', flag: '🇮🇳', label: 'हिन्दी' },
 ]
 
 const UI = {
   en: {
-    title: 'Create Your Account.', sub: 'Join GigWrench — free to start',
-    role_q: 'I am joining as a...', role_pro: 'Pro — I offer services', role_cust: 'Customer — I need services',
+    title: 'Create Your Account.', sub: 'Join GigWrench â free to start',
+    role_q: 'I am joining as a...', role_pro: 'Pro â I offer services', role_cust: 'Customer â I need services',
     first: 'First Name', last: 'Last Name', email: 'Email Address', password: 'Password', confirm: 'Confirm Password',
     show: 'Show', hide: 'Hide', creating: 'Creating account...', create: 'Create Account',
     or: 'or continue with', google: 'Continue with Google',
     have_account: 'Already have an account?', signin: 'Sign in',
     terms_pre: 'By creating an account you agree to our', terms: 'Terms of Service', and: 'and', privacy: 'Privacy Policy',
     pw_title: 'Password Requirements (NIST SP 800-63B)',
-    pw_length: 'Minimum 12 characters', pw_upper: 'At least one uppercase letter (A–Z)',
-    pw_lower: 'At least one lowercase letter (a–z)', pw_number: 'At least one number (0–9)',
+    pw_length: 'Minimum 12 characters', pw_upper: 'At least one uppercase letter (AâZ)',
+    pw_lower: 'At least one lowercase letter (aâz)', pw_number: 'At least one number (0â9)',
     pw_special: 'At least one special character (!@#$...)', pw_no_common: 'Not a commonly used password',
     pw_no_spaces: 'No leading or trailing spaces', pw_match: 'Passwords match',
     pw_strength: 'Password strength', weak: 'Weak', fair: 'Fair', good: 'Good', strong: 'Strong',
@@ -77,6 +81,7 @@ const STRENGTH_CONFIG = [
 export default function SignupPage() {
   const [lang, setLang] = useState('en')
   const [role, setRole] = useState('pro')
+  const [country, setCountry] = useState('US')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -137,6 +142,7 @@ export default function SignupPage() {
           last_name: lastName.trim(),
           role,
           language: lang,
+          country,
           signup_method: 'email',
           signup_at: new Date().toISOString(),
         },
@@ -192,7 +198,7 @@ export default function SignupPage() {
                     {role === r && <div className="w-1.5 h-1.5 rounded-full bg-black"/>}
                   </div>
                   <div>
-                    <div className="text-xs font-medium">{r === 'pro' ? '🔧' : '🏠'}</div>
+                    <div className="text-xs font-medium">{r === 'pro' ? 'ð§' : 'ð '}</div>
                     <div className="text-xs font-mono mt-0.5">{r === 'pro' ? ui.role_pro : ui.role_cust}</div>
                   </div>
                 </button>
@@ -291,11 +297,40 @@ export default function SignupPage() {
               <div className="relative">
                 <input type={showConfirm ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)} required autoComplete="new-password"
                   className={`w-full bg-[#131C28] border rounded-lg px-4 py-3 pr-12 text-white text-sm outline-none transition-colors ${confirm.length > 0 ? confirmPassed ? 'border-green-500/40' : 'border-red-500/40' : 'border-white/8 focus:border-yellow-400/40'}`}
-                  placeholder="••••••••••••"/>
+                  placeholder="â¢â¢â¢â¢â¢â¢â¢â¢â¢â¢â¢â¢"/>
                 <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors">
                   {showConfirm ? <EyeOff size={13}/> : <Eye size={13}/>}
                 </button>
               </div>
+            </div>
+            {/* Country */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+                Country <span className="text-yellow-400">*</span>
+              </label>
+              <select
+                value={country}
+                onChange={e => setCountry(e.target.value)}
+                required
+                className="bg-[#131C28] border border-white/8 rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-yellow-400/40 transition-colors appearance-none"
+              >
+                <option value="US">🇺🇸 United States</option>
+                <option value="GB">🇬🇧 United Kingdom</option>
+                <option value="CA">🇨🇦 Canada</option>
+                <option value="AU">🇦🇺 Australia</option>
+                <option value="MX">🇲🇽 Mexico</option>
+                <option value="BR">🇧🇷 Brazil</option>
+                <option value="FR">🇫🇷 France</option>
+                <option value="DE">🇩🇪 Germany</option>
+                <option value="PL">🇵🇱 Poland</option>
+                <option value="PH">🇵🇭 Philippines</option>
+                <option value="IN">🇮🇳 India</option>
+                <option value="SA">🇸🇦 Saudi Arabia</option>
+                <option value="AE">🇦🇪 UAE</option>
+                <option value="RU">🇷🇺 Russia</option>
+                <option value="CN">🇨🇳 China</option>
+                <option value="OTHER">🌍 Other</option>
+              </select>
             </div>
             <div className="flex items-start gap-3 mt-1">
               <button type="button" onClick={() => setAgreedTerms(!agreedTerms)}
