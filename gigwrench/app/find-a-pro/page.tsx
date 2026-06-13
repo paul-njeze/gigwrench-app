@@ -49,11 +49,13 @@ export default function FindAProPage() {
   const startX = useRef(0)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const fetchPros = useCallback(async (cat: string) => {
+    const fetchPros = useCallback(async (cat: string) => {
     setLoading(true)
+    const timeout = setTimeout(() => { setLoading(false) }, 8000)
     try {
       navigator.geolocation.getCurrentPosition(
         async pos => {
+          clearTimeout(timeout)
           const { latitude, longitude } = pos.coords
           const catParam = cat === 'All' ? '' : `&category=${cat.toLowerCase()}`
           const res = await fetch(`/api/pros/nearby?lat=${latitude}&lng=${longitude}&radius=25${catParam}`)
@@ -63,12 +65,16 @@ export default function FindAProPage() {
           setLoading(false)
         },
         () => {
+          clearTimeout(timeout)
           fetch(`/api/pros/nearby?lat=40.7128&lng=-74.0060&radius=50${cat === 'All' ? '' : `&category=${cat.toLowerCase()}`}`)
             .then(r => r.json())
             .then(data => { setPros(data.pros || []); setIndex(0); setLoading(false) })
-        }
+            .catch(() => setLoading(false))
+        },
+        { timeout: 6000 }
       )
     } catch {
+      clearTimeout(timeout)
       setLoading(false)
     }
   }, [])
