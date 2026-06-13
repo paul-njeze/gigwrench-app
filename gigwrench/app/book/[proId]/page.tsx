@@ -370,7 +370,7 @@ export default function BookPage() {
             <div className="mb-4 p-4 rounded-xl bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)]">
               <div className="flex items-start gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[var(--color-gw-accent)] text-black flex items-center justify-center text-xs font-bold flex-shrink-0">D</div>
-                <p className="text-sm leading-relaxed">Hi! I'm Dispatch, your GigWrench AI booking agent. I'll help get the right Pro to you. First, tell me a bit about yourself and describe the problem you're experiencing.</p>
+                <p className="text-sm leading-relaxed">Hey there! I'm Dispatch, your GigWrench booking coordinator. Let's get you sorted quickly. Tell me a bit about yourself and describe what's going on.</p>
               </div>
             </div>
 
