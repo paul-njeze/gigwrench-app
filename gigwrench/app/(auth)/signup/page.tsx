@@ -297,7 +297,7 @@ export default function SignupPage() {
               <div className="relative">
                 <input type={showConfirm ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)} required autoComplete="new-password"
                   className={`w-full bg-[#131C28] border rounded-lg px-4 py-3 pr-12 text-white text-sm outline-none transition-colors ${confirm.length > 0 ? confirmPassed ? 'border-green-500/40' : 'border-red-500/40' : 'border-white/8 focus:border-yellow-400/40'}`}
-                  placeholder="â¢â¢â¢â¢â¢â¢â¢â¢â¢â¢â¢â¢"/>
+                  placeholder="************"/>
                 <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors">
                   {showConfirm ? <EyeOff size={13}/> : <Eye size={13}/>}
                 </button>
@@ -314,22 +314,22 @@ export default function SignupPage() {
                 required
                 className="bg-[#131C28] border border-white/8 rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-yellow-400/40 transition-colors appearance-none"
               >
-                <option value="US">🇺🇸 United States</option>
-                <option value="GB">🇬🇧 United Kingdom</option>
-                <option value="CA">🇨🇦 Canada</option>
-                <option value="AU">🇦🇺 Australia</option>
-                <option value="MX">🇲🇽 Mexico</option>
-                <option value="BR">🇧🇷 Brazil</option>
-                <option value="FR">🇫🇷 France</option>
-                <option value="DE">🇩🇪 Germany</option>
-                <option value="PL">🇵🇱 Poland</option>
-                <option value="PH">🇵🇭 Philippines</option>
-                <option value="IN">🇮🇳 India</option>
-                <option value="SA">🇸🇦 Saudi Arabia</option>
-                <option value="AE">🇦🇪 UAE</option>
-                <option value="RU">🇷🇺 Russia</option>
-                <option value="CN">🇨🇳 China</option>
-                <option value="OTHER">🌍 Other</option>
+                <option value="US">United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="MX">Mexico</option>
+                <option value="BR">Brazil</option>
+                <option value="FR">France</option>
+                <option value="DE">Germany</option>
+                <option value="PL">Poland</option>
+                <option value="PH">Philippines</option>
+                <option value="IN">India</option>
+                <option value="SA">Saudi Arabia</option>
+                <option value="AE">UAE</option>
+                <option value="RU">Russia</option>
+                <option value="CN">China</option>
+                <option value="OTHER">Other</option>
               </select>
             </div>
             <div className="flex items-start gap-3 mt-1">
