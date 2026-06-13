@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Check, X, Eye, EyeOff, Shield, AlertCircle } from 'lucide-react'
+import { Check, X, Eye, EyeOff, Shield, AlertCircle, Wrench, Home } from 'lucide-react'
 
 const LANGS = [
   { code: 'en', flag: '🇺🇸', label: 'English' },
@@ -198,7 +198,7 @@ export default function SignupPage() {
                     {role === r && <div className="w-1.5 h-1.5 rounded-full bg-black"/>}
                   </div>
                   <div>
-                    <div className="text-xs font-medium">{r === 'pro' ? 'ð§' : 'ð '}</div>
+                           <div className="text-xs font-medium flex items-center justify-center">{r === 'pro' ? <Wrench size={14}/> : <Home size={14}/>}</div>
                     <div className="text-xs font-mono mt-0.5">{r === 'pro' ? ui.role_pro : ui.role_cust}</div>
                   </div>
                 </button>
