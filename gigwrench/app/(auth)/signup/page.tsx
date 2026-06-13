@@ -21,16 +21,16 @@ const LANGS = [
 
 const UI = {
   en: {
-    title: 'Create Your Account.', sub: 'Join GigWrench â free to start',
-    role_q: 'I am joining as a...', role_pro: 'Pro â I offer services', role_cust: 'Customer â I need services',
+    title: 'Create Your Account.', sub: 'Join GigWrench - free to start',
+    role_q: 'I am joining as a...', role_pro: 'Pro - I offer services', role_cust: 'Customer - I need services',
     first: 'First Name', last: 'Last Name', email: 'Email Address', password: 'Password', confirm: 'Confirm Password',
     show: 'Show', hide: 'Hide', creating: 'Creating account...', create: 'Create Account',
     or: 'or continue with', google: 'Continue with Google',
     have_account: 'Already have an account?', signin: 'Sign in',
     terms_pre: 'By creating an account you agree to our', terms: 'Terms of Service', and: 'and', privacy: 'Privacy Policy',
     pw_title: 'Password Requirements (NIST SP 800-63B)',
-    pw_length: 'Minimum 12 characters', pw_upper: 'At least one uppercase letter (AâZ)',
-    pw_lower: 'At least one lowercase letter (aâz)', pw_number: 'At least one number (0â9)',
+    pw_length: 'Minimum 12 characters', pw_upper: 'At least one uppercase letter (A-Z)',
+    pw_lower: 'At least one lowercase letter (a-z)', pw_number: 'At least one number (0-9)',
     pw_special: 'At least one special character (!@#$...)', pw_no_common: 'Not a commonly used password',
     pw_no_spaces: 'No leading or trailing spaces', pw_match: 'Passwords match',
     pw_strength: 'Password strength', weak: 'Weak', fair: 'Fair', good: 'Good', strong: 'Strong',
