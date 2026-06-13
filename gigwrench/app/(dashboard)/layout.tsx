@@ -9,6 +9,7 @@ import {
   LayoutDashboard, Briefcase, FileText, Users, MessageSquare,
   CalendarCheck, Settings, LogOut, ChevronDown, Menu, X, Wrench
 } from 'lucide-react'
+import VerificationBanner from '@/components/VerificationBanner'
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { t, lang, setLang } = useLang()
@@ -125,6 +126,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           </button>
           <span className="font-display text-lg tracking-widest text-white">GIG<span className="text-yellow-400">WRENCH</span></span>
         </div>
+        <VerificationBanner />
         {children}
       </main>
     </div>
