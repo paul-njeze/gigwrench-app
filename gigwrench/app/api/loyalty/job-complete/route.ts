@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
       .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('id', job_id)
 
-    const pro = job.pro_id as { id: string; first_name: string; last_name: string; phone: string }
+    const pro = job.pro_id as unknown as { id: string; first_name: string; last_name: string; phone: string }
     const proName = `${pro.first_name} ${pro.last_name}`
     const amount = job.final_amount || job.quoted_amount
 
