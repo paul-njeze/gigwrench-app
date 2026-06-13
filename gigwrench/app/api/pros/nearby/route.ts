@@ -66,7 +66,7 @@ return NextResponse.json({ error: error.message }, { status: 500 })
 }
 
 const results = (pros || []).map(pro => {
-const profile = pro.profiles as ProProfile['profiles']
+const profile = pro.profiles as unknown as ProProfile['profiles']
 const distanceLat = Math.abs((pro.service_lat || 0) - lat) * 69
 const distanceLng = Math.abs((pro.service_lng || 0) - lng) * 69 * Math.cos(lat * Math.PI / 180)
 const distance = Math.round(Math.sqrt(distanceLat * distanceLat + distanceLng * distanceLng) * 10) / 10
