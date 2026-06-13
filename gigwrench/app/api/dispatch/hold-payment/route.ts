@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
               return NextResponse.json({ error: `Stripe price error: ${text}` }, { status: 500 })
       }
 
-      const priceData = await priceRes.json() as { id: string }
+      const priceData = await priceRes.json() as unknown as { id: string }
           const priceId = priceData.id
 
       const linkParams = new URLSearchParams({
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
               return NextResponse.json({ error: `Stripe payment link error: ${text}` }, { status: 500 })
       }
 
-      const linkData = await linkRes.json() as { url: string }
+      const linkData = await linkRes.json() as unknown as { url: string }
           const paymentUrl = linkData.url
 
       await supabase.from("deposit_holds").insert({
