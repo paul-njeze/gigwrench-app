@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { Check, X, Eye, EyeOff, Shield, AlertCircle, Wrench, Home } from 'lucide-react'
 
 const LANGS = [
-  { code: 'en', flag: '🇺🇸', label: 'English' },
+  { code: 'en', flag: '🇺🇸', label: 'English' },h
   { code: 'es', flag: '🇪🇸', label: 'Español' },
   { code: 'pt', flag: '🇵🇹', label: 'Português' },
   { code: 'fr', flag: '🇫🇷', label: 'Français' },
@@ -28,7 +28,7 @@ const UI = {
     or: 'or continue with', google: 'Continue with Google',
     have_account: 'Already have an account?', signin: 'Sign in',
     terms_pre: 'By creating an account you agree to our', terms: 'Terms of Service', and: 'and', privacy: 'Privacy Policy',
-    pw_title: 'Password Requirements (NIST SP 800-63B)',
+    pw_title: 'Account Security Requirements',
     pw_length: 'Minimum 12 characters', pw_upper: 'At least one uppercase letter (A-Z)',
     pw_lower: 'At least one lowercase letter (a-z)', pw_number: 'At least one number (0-9)',
     pw_special: 'At least one special character (!@#$...)', pw_no_common: 'Not a commonly used password',
@@ -37,7 +37,7 @@ const UI = {
     err_match: 'Passwords do not match', err_weak: 'Password does not meet requirements',
     err_email: 'Please enter a valid email address', err_generic: 'Something went wrong. Please try again.',
     err_exists: 'An account with this email already exists. Sign in instead.',
-    nist_note: 'We follow NIST SP 800-63B guidelines to keep your account secure.',
+    nist_note: 'Your account is protected by enterprise-grade security standards.',
   },
 }
 
