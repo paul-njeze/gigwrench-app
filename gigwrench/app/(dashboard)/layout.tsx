@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import VerificationBanner from '@/components/VerificationBanner'
 import OnboardingChat from '@/components/OnboardingChat'
+import TourOverlay from '@/components/TourOverlay'
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { t, lang, setLang } = useLang()
@@ -19,14 +20,15 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   const [showLang, setShowLang] = useState(false)
 
   const nav = [
-    { href: '/dashboard', icon: LayoutDashboard, key: 'dashboard' },
-    { href: '/jobs', icon: Briefcase, key: 'jobs' },
-    { href: '/dispatch', icon: CalendarCheck, key: 'dispatch' },    { href: '/invoices', icon: FileText, key: 'invoices' },
-    { href: '/customers', icon: Users, key: 'customers' },
-    { href: '/analytics', icon: BarChart2, key: 'analytics' },
-    { href: '/messages', icon: MessageSquare, key: 'messages' },
-    { href: '/find-a-pro', icon: Search, key: 'find_a_pro' },
-    { href: '/settings', icon: Settings, key: 'settings' },
+    { href: '/dashboard', icon: LayoutDashboard, key: 'dashboard', tour: 'tour-dashboard' },
+    { href: '/jobs', icon: Briefcase, key: 'jobs', tour: 'tour-jobs' },
+    { href: '/dispatch', icon: CalendarCheck, key: 'dispatch', tour: 'tour-dispatch' },
+    { href: '/invoices', icon: FileText, key: 'invoices', tour: 'tour-invoices' },
+    { href: '/customers', icon: Users, key: 'customers', tour: 'tour-customers' },
+    { href: '/analytics', icon: BarChart2, key: 'analytics', tour: 'tour-analytics' },
+    { href: '/messages', icon: MessageSquare, key: 'messages', tour: '' },
+    { href: '/find-a-pro', icon: Search, key: 'find_a_pro', tour: 'tour-find-pro' },
+    { href: '/settings', icon: Settings, key: 'settings', tour: '' },
   ]
 
   async function handleLogout() {
@@ -50,10 +52,11 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto">
-        {nav.map(({ href, icon: Icon, key }) => {
+        {nav.map(({ href, icon: Icon, key, tour }) => {
           const active = pathname === href || pathname.startsWith(href + '/')
           return (
             <Link key={href} href={href} onClick={onClose}
+              {...(tour ? { 'data-tour': tour } : {})}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm no-underline group
                 ${active ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-white/40 hover:text-white hover:bg-white/4'}`}>
               <Icon size={16} className={active ? 'text-yellow-400' : 'text-white/30 group-hover:text-white/60'}/>
@@ -141,6 +144,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [loading, setLoading] = useState(true)
   const [userLang, setUserLang] = useState<Language>('en')
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showTour, setShowTour] = useState(false)
   const [userId, setUserId] = useState('')
   const [userName, setUserName] = useState('')
 
@@ -152,7 +156,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       // Get user's preferred language
       const { data: profile } = await supabase
         .from('profiles')
-        .select('language, role, first_name, onboarding_completed')
+        .select('language, role, first_name, onboarding_completed, tour_completed')
         .eq('id', user.id)
         .single()
       if (profile?.language) setUserLang(profile.language as Language)
@@ -161,6 +165,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       // Show onboarding for Pros who have not completed it yet
       if (profile?.role === 'pro' && !profile?.onboarding_completed) {
         setShowOnboarding(true)
+      } else if (profile?.role === 'pro' && !profile?.tour_completed) {
+        setShowTour(true)
       }
       setLoading(false)
     }
@@ -183,6 +189,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           userName={userName}
           userId={userId}
           onComplete={() => setShowOnboarding(false)}
+        />
+      )}
+      {showTour && !showOnboarding && (
+        <TourOverlay
+          userId={userId}
+          onComplete={() => setShowTour(false)}
         />
       )}
       <DashboardShell>{children}</DashboardShell>
