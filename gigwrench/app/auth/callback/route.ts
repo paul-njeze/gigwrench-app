@@ -38,7 +38,35 @@ export async function GET(request: NextRequest) {
           last_name: meta?.last_name || meta?.full_name?.split(' ').slice(1).join(' ') || '',
           email: data.user.email || '',
           language: meta?.language || 'en',
-          country: 'US',
+          country: meta?.country || 'US',
+          currency_code: meta?.currency_code || 'USD',
+          currency_symbol: meta?.currency_symbol || '
+
+        // Create role-specific profile
+        if (userRole === 'pro') {
+          await supabase.from('pro_profiles').insert({ id: data.user.id })
+        } else {
+          await supabase.from('customer_profiles').insert({ id: data.user.id })
+        }
+      }
+
+      // NIST AC-2: Redirect to appropriate page
+      const forwardedHost = request.headers.get('x-forwarded-host')
+      const isLocalEnv = process.env.NODE_ENV === 'development'
+
+      if (isLocalEnv) {
+        return NextResponse.redirect(`${origin}${next}`)
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+      } else {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+    }
+  }
+
+  // NIST AU-6: Log failed authentication — redirect to error
+  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`)
+},
         })
 
         // Create role-specific profile
