@@ -366,7 +366,7 @@ const COMPARE_ROWS = [
 const FAQ_PROS = [
   { q: 'How much does GigWrench cost?', a: '$19 per month, flat. No lead fees, no commissions, no hidden charges. Cancel any time.' },
   { q: 'How does Dispatch work when I am on a job?', a: 'When a customer texts or fills out your booking page, Dispatch replies within 90 seconds, collects their details, asks about the problem, and notifies you. You never miss a lead even when your hands are full.' },
-  { q: 'Do I need to be a tech expert to use GigWrench?', a: 'No. If you can send a text, you can use GigWrench. The interface is built for tradespeople, not software engineers.' },
+  { q: 'Do I need to be a tech expert to use GigWrench?', a: 'No. If you can send a text, you can use GigWrench. The interface is built for Pros, not software engineers.' },
   { q: 'Does GigWrench take a cut of my earnings?', a: 'Never. Your earnings are yours. We charge a flat monthly fee. Stripe processes payments directly to your account.' },
   { q: 'What is GigWrench Lens?', a: 'Lens uses your phone camera and AI to identify any part instantly. It shows you what the part is, where to source it, and lets you add it to an invoice in one tap. No other platform offers this.' },
   { q: 'What languages is GigWrench available in?', a: 'English, Spanish, Portuguese, French, Polish, Arabic, Tagalog, Russian, Chinese, and Hindi. The full app and booking pages work in all 10 languages.' },
