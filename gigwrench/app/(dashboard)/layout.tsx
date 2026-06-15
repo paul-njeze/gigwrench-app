@@ -10,6 +10,7 @@ import {
   CalendarCheck, Settings, LogOut, ChevronDown, Menu, X, Wrench, Search, BarChart2
 } from 'lucide-react'
 import VerificationBanner from '@/components/VerificationBanner'
+import OnboardingChat from '@/components/OnboardingChat'
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { t, lang, setLang } = useLang()
@@ -139,6 +140,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [userLang, setUserLang] = useState<Language>('en')
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [userId, setUserId] = useState('')
+  const [userName, setUserName] = useState('')
 
   useEffect(() => {
     async function checkAuth() {
@@ -146,8 +150,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       // Get user's preferred language
-      const { data: profile } = await supabase.from('profiles').select('language').eq('id', user.id).single()
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('language, role, first_name, onboarding_completed')
+        .eq('id', user.id)
+        .single()
       if (profile?.language) setUserLang(profile.language as Language)
+      setUserId(user.id)
+      setUserName(profile?.first_name || '')
+      // Show onboarding for Pros who have not completed it yet
+      if (profile?.role === 'pro' && !profile?.onboarding_completed) {
+        setShowOnboarding(true)
+      }
       setLoading(false)
     }
     checkAuth()
@@ -164,6 +178,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <LangProvider defaultLang={userLang}>
+      {showOnboarding && (
+        <OnboardingChat
+          userName={userName}
+          userId={userId}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
       <DashboardShell>{children}</DashboardShell>
     </LangProvider>
   )
