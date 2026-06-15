@@ -5,24 +5,16 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Check, X, Eye, EyeOff, Shield, AlertCircle, Wrench, Home } from 'lucide-react'
+import { LANGUAGES, Language } from '@/lib/lang/index'
 
-const LANGS = [
-  { code: 'en', flag: '🇺🇸', label: 'English' },h
-  { code: 'es', flag: '🇪🇸', label: 'Español' },
-  { code: 'pt', flag: '🇵🇹', label: 'Português' },
-  { code: 'fr', flag: '🇫🇷', label: 'Français' },
-  { code: 'pl', flag: '🇵🇱', label: 'Polski' },
-  { code: 'tl', flag: '🇵🇭', label: 'Tagalog' },
-  { code: 'ar', flag: '🇸🇦', label: 'العربية' },
-  { code: 'ru', flag: '🇷🇺', label: 'Русский' },
-  { code: 'zh', flag: '🇨🇳', label: '中文' },
-  { code: 'hi', flag: '🇮🇳', label: 'हिन्दी' },
-]
+const LANG_ORDER: Language[] = ['en','es','pt','fr','ar','zh','hi','ko','tr','de','it','nl','ro','sv']
 
-const UI = {
+const UI: Record<Language, Record<string, string>> = {
   en: {
-    title: 'Create Your Account.', sub: 'Join GigWrench - free to start',
+    step_lang: 'Choose your language', step_lang_sub: 'You can change this any time in settings.',
+    title: 'Create Your Account', sub: 'Join GigWrench - free to start',
     role_q: 'I am joining as a...', role_pro: 'Pro - I offer services', role_cust: 'Customer - I need services',
+    country_label: 'Country', currency_label: 'Currency',
     first: 'First Name', last: 'Last Name', email: 'Email Address', password: 'Password', confirm: 'Confirm Password',
     show: 'Show', hide: 'Hide', creating: 'Creating account...', create: 'Create Account',
     or: 'or continue with', google: 'Continue with Google',
@@ -38,6 +30,280 @@ const UI = {
     err_email: 'Please enter a valid email address', err_generic: 'Something went wrong. Please try again.',
     err_exists: 'An account with this email already exists. Sign in instead.',
     nist_note: 'Your account is protected by enterprise-grade security standards.',
+    loading_countries: 'Loading countries...',
+  },
+  es: {
+    step_lang: 'Elige tu idioma', step_lang_sub: 'Puedes cambiarlo en cualquier momento.',
+    title: 'Crea tu cuenta', sub: 'Unete a GigWrench - gratis para empezar',
+    role_q: 'Me uno como...', role_pro: 'Pro - ofrezco servicios', role_cust: 'Cliente - necesito servicios',
+    country_label: 'Pais', currency_label: 'Moneda',
+    first: 'Nombre', last: 'Apellido', email: 'Correo electronico', password: 'Contrasena', confirm: 'Confirmar contrasena',
+    show: 'Ver', hide: 'Ocultar', creating: 'Creando cuenta...', create: 'Crear cuenta',
+    or: 'o continua con', google: 'Continuar con Google',
+    have_account: 'Ya tienes una cuenta?', signin: 'Inicia sesion',
+    terms_pre: 'Al crear una cuenta aceptas nuestros', terms: 'Terminos de servicio', and: 'y', privacy: 'Politica de privacidad',
+    pw_title: 'Requisitos de seguridad', pw_length: 'Minimo 12 caracteres', pw_upper: 'Al menos una mayuscula (A-Z)',
+    pw_lower: 'Al menos una minuscula (a-z)', pw_number: 'Al menos un numero (0-9)',
+    pw_special: 'Al menos un caracter especial (!@#$...)', pw_no_common: 'No es una contrasena comun',
+    pw_no_spaces: 'Sin espacios al inicio o al final', pw_match: 'Las contrasenas coinciden',
+    pw_strength: 'Fortaleza', weak: 'Debil', fair: 'Regular', good: 'Buena', strong: 'Fuerte',
+    err_match: 'Las contrasenas no coinciden', err_weak: 'La contrasena no cumple los requisitos',
+    err_email: 'Ingresa un correo valido', err_generic: 'Algo salio mal. Intentalo de nuevo.',
+    err_exists: 'Ya existe una cuenta con este correo. Inicia sesion.',
+    nist_note: 'Tu cuenta esta protegida por estandares de seguridad de nivel empresarial.',
+    loading_countries: 'Cargando paises...',
+  },
+  pt: {
+    step_lang: 'Escolha seu idioma', step_lang_sub: 'Voce pode alterar isso a qualquer momento.',
+    title: 'Crie sua conta', sub: 'Entre no GigWrench - gratis para comecar',
+    role_q: 'Estou entrando como...', role_pro: 'Pro - ofereco servicos', role_cust: 'Cliente - preciso de servicos',
+    country_label: 'Pais', currency_label: 'Moeda',
+    first: 'Nome', last: 'Sobrenome', email: 'Endereco de email', password: 'Senha', confirm: 'Confirmar senha',
+    show: 'Ver', hide: 'Ocultar', creating: 'Criando conta...', create: 'Criar conta',
+    or: 'ou continue com', google: 'Continuar com Google',
+    have_account: 'Ja tem uma conta?', signin: 'Entrar',
+    terms_pre: 'Ao criar uma conta voce concorda com nossos', terms: 'Termos de Servico', and: 'e', privacy: 'Politica de Privacidade',
+    pw_title: 'Requisitos de seguranca', pw_length: 'Minimo 12 caracteres', pw_upper: 'Pelo menos uma letra maiuscula (A-Z)',
+    pw_lower: 'Pelo menos uma letra minuscula (a-z)', pw_number: 'Pelo menos um numero (0-9)',
+    pw_special: 'Pelo menos um caractere especial (!@#$...)', pw_no_common: 'Nao e uma senha comum',
+    pw_no_spaces: 'Sem espacos no inicio ou no fim', pw_match: 'As senhas coincidem',
+    pw_strength: 'Forca', weak: 'Fraca', fair: 'Regular', good: 'Boa', strong: 'Forte',
+    err_match: 'As senhas nao coincidem', err_weak: 'A senha nao atende aos requisitos',
+    err_email: 'Insira um email valido', err_generic: 'Algo deu errado. Tente novamente.',
+    err_exists: 'Ja existe uma conta com este email. Faca login.',
+    nist_note: 'Sua conta e protegida por padroes de seguranca empresarial.',
+    loading_countries: 'Carregando paises...',
+  },
+  fr: {
+    step_lang: 'Choisissez votre langue', step_lang_sub: 'Vous pouvez le modifier a tout moment.',
+    title: 'Creer votre compte', sub: 'Rejoignez GigWrench - gratuit pour commencer',
+    role_q: 'Je rejoins en tant que...', role_pro: 'Pro - je propose des services', role_cust: "Client - j'ai besoin de services",
+    country_label: 'Pays', currency_label: 'Devise',
+    first: 'Prenom', last: 'Nom', email: 'Adresse email', password: 'Mot de passe', confirm: 'Confirmer le mot de passe',
+    show: 'Voir', hide: 'Masquer', creating: 'Creation du compte...', create: 'Creer un compte',
+    or: 'ou continuer avec', google: 'Continuer avec Google',
+    have_account: 'Vous avez deja un compte ?', signin: 'Se connecter',
+    terms_pre: 'En creant un compte vous acceptez nos', terms: "Conditions d'utilisation", and: 'et', privacy: 'Politique de confidentialite',
+    pw_title: 'Exigences de securite', pw_length: 'Minimum 12 caracteres', pw_upper: 'Au moins une majuscule (A-Z)',
+    pw_lower: 'Au moins une minuscule (a-z)', pw_number: 'Au moins un chiffre (0-9)',
+    pw_special: 'Au moins un caractere special (!@#$...)', pw_no_common: 'Pas un mot de passe courant',
+    pw_no_spaces: "Pas d'espaces au debut ou a la fin", pw_match: 'Les mots de passe correspondent',
+    pw_strength: 'Force', weak: 'Faible', fair: 'Moyen', good: 'Bon', strong: 'Fort',
+    err_match: 'Les mots de passe ne correspondent pas', err_weak: 'Le mot de passe ne repond pas aux exigences',
+    err_email: 'Veuillez entrer une adresse email valide', err_generic: "Une erreur s'est produite. Reessayez.",
+    err_exists: 'Un compte avec cet email existe deja. Connectez-vous.',
+    nist_note: 'Votre compte est protege par des normes de securite professionnelles.',
+    loading_countries: 'Chargement des pays...',
+  },
+  ar: {
+    step_lang: 'اختر لغتك', step_lang_sub: 'يمكنك تغيير ذلك في اي وقت.',
+    title: 'انشئ حسابك', sub: 'انضم الى GigWrench - مجاني للبدء',
+    role_q: 'انضم بصفتي...', role_pro: 'محترف - اقدم خدمات', role_cust: 'عميل - احتاج خدمات',
+    country_label: 'الدولة', currency_label: 'العملة',
+    first: 'الاسم الاول', last: 'اسم العائلة', email: 'البريد الالكتروني', password: 'كلمة المرور', confirm: 'تاكيد كلمة المرور',
+    show: 'اظهار', hide: 'اخفاء', creating: 'جاري انشاء الحساب...', create: 'انشاء حساب',
+    or: 'او تابع مع', google: 'المتابعة مع Google',
+    have_account: 'لديك حساب بالفعل?', signin: 'تسجيل الدخول',
+    terms_pre: 'بانشاء حساب فانت توافق على', terms: 'شروط الخدمة', and: 'و', privacy: 'سياسة الخصوصية',
+    pw_title: 'متطلبات الامان', pw_length: '12 حرفا على الاقل', pw_upper: 'حرف كبير واحد على الاقل (A-Z)',
+    pw_lower: 'حرف صغير واحد على الاقل (a-z)', pw_number: 'رقم واحد على الاقل (0-9)',
+    pw_special: 'رمز خاص واحد على الاقل (!@#$...)', pw_no_common: 'ليست كلمة مرور شائعة',
+    pw_no_spaces: 'بدون مسافات في البداية او النهاية', pw_match: 'كلمات المرور متطابقة',
+    pw_strength: 'القوة', weak: 'ضعيفة', fair: 'متوسطة', good: 'جيدة', strong: 'قوية',
+    err_match: 'كلمات المرور غير متطابقة', err_weak: 'كلمة المرور لا تلبي المتطلبات',
+    err_email: 'الرجاء ادخال بريد الكتروني صالح', err_generic: 'حدث خطا ما. حاول مرة اخرى.',
+    err_exists: 'يوجد حساب بهذا البريد بالفعل. سجل دخولك.',
+    nist_note: 'حسابك محمي بمعايير امان احترافية.',
+    loading_countries: 'جاري تحميل الدول...',
+  },
+  zh: {
+    step_lang: '选择您的语言', step_lang_sub: '您可以随时在设置中更改。',
+    title: '创建您的账户', sub: '加入 GigWrench - 免费开始',
+    role_q: '我以...身份加入', role_pro: '专业人士 - 我提供服务', role_cust: '客户 - 我需要服务',
+    country_label: '国家', currency_label: '货币',
+    first: '名字', last: '姓氏', email: '电子邮件', password: '密码', confirm: '确认密码',
+    show: '显示', hide: '隐藏', creating: '正在创建账户...', create: '创建账户',
+    or: '或继续使用', google: '使用 Google 继续',
+    have_account: '已有账户?', signin: '登录',
+    terms_pre: '创建账户即表示您同意我们的', terms: '服务条款', and: '和', privacy: '隐私政策',
+    pw_title: '账户安全要求', pw_length: '至少12个字符', pw_upper: '至少一个大写字母 (A-Z)',
+    pw_lower: '至少一个小写字母 (a-z)', pw_number: '至少一个数字 (0-9)',
+    pw_special: '至少一个特殊字符 (!@#$...)', pw_no_common: '不是常用密码',
+    pw_no_spaces: '开头或结尾不能有空格', pw_match: '密码匹配',
+    pw_strength: '强度', weak: '弱', fair: '一般', good: '良好', strong: '强',
+    err_match: '密码不匹配', err_weak: '密码不符合要求',
+    err_email: '请输入有效的电子邮件地址', err_generic: '出了点问题，请重试。',
+    err_exists: '该邮筱已注册账户，请登录。',
+    nist_note: '您的账户受企业级安全标准保护。',
+    loading_countries: '正在加载国家...',
+  },
+  hi: {
+    step_lang: 'अपनी भाषा चुनें', step_lang_sub: 'आप इसे किसी भी समय बदल सकते हैं।',
+    title: 'अपना खाता बनाएं', sub: 'GigWrench से जुड़ें - शुरू करें मुफ्त',
+    role_q: 'मैं शामिल हो रहा हूं...', role_pro: 'Pro - मैं सेवाएं प्रदान करता हूं', role_cust: 'ग्राहक - मुझे सेवाएं चाहिए',
+    country_label: 'देश', currency_label: 'मुद्रा',
+    first: 'पहला नाम', last: 'अंतिम नाम', email: 'ईमेल पता', password: 'पासवर्ड', confirm: 'पासवर्ड की पुष्टि करें',
+    show: 'दिखाएं', hide: 'छुपाएं', creating: 'खाता बना रहे हैं...', create: 'खाता बनाएं',
+    or: 'या जारी रखें', google: 'Google से जारी रखें',
+    have_account: 'पहले से खाता है?', signin: 'साइन इन करें',
+    terms_pre: 'खाता बनाकर आप हमारी', terms: 'सेवा की शर्तें', and: 'और', privacy: 'गोपनीयता नीति',
+    pw_title: 'सुरक्षा आवश्यकताएं', pw_length: 'न्यूनतम 12 अक्षर', pw_upper: 'कम से कम एक बड़ा अक्षर (A-Z)',
+    pw_lower: 'कम से कम एक छोटा अक्षर (a-z)', pw_number: 'कम से कम एक संख्या (0-9)',
+    pw_special: 'कम से कम एक विशेष वर्ण (!@#$...)', pw_no_common: 'सामान्य पासवर्ड नहीं',
+    pw_no_spaces: 'शुरू या अंत में स्पेस नहीं', pw_match: 'पासवर्ड मेल खाते हैं',
+    pw_strength: 'ताकत', weak: 'कमजोर', fair: 'ठीक', good: 'अच्छा', strong: 'मजबूत',
+    err_match: 'पासवर्ड मेल नहीं खाते', err_weak: 'पासवर्ड आवश्यकताएं पूरी नहीं होतीं',
+    err_email: 'कृपया एक वैध ईमेल दर्ज करें', err_generic: 'कुछ गलत हो गया। दोबारा कोशिश करें।',
+    err_exists: 'इस ईमेल से पहले से खाता है। साइन इन करें।',
+    nist_note: 'आपका खाता उद्यम-स्तरीय सुरक्षा मानकों द्वारा सुरक्षिت है।',
+    loading_countries: 'देश लोड हो रहे हैं...',
+  },
+  ko: {
+    step_lang: '언어를 선택하세요', step_lang_sub: '설정에서 언제든지 변경할 수 있습니다.',
+    title: '계정 만들기', sub: 'GigWrench 가입 - 무료로 시작',
+    role_q: '가입 유형을 선택하세요', role_pro: 'Pro - 서비스를 제공합니다', role_cust: '고객 - 서비스가 필요합니다',
+    country_label: '국가', currency_label: '통화',
+    first: '이름', last: '성', email: '이메일 주소', password: '비밀번호', confirm: '비밀번호 확인',
+    show: '표시', hide: '숨기기', creating: '계정 생성 중...', create: '계정 만들기',
+    or: '또는 계속', google: 'Google로 계속',
+    have_account: '이미 계정이 있나요?', signin: '로그인',
+    terms_pre: '계정을 만들면 당사의', terms: '서비스 약관', and: '의', privacy: '개인정보 처리방침',
+    pw_title: '보안 요구사항', pw_length: '최소 12자', pw_upper: '대문자 하나 이상 (A-Z)',
+    pw_lower: '소문자 하나 이상 (a-z)', pw_number: '숫자 하나 이상 (0-9)',
+    pw_special: '특수문자 하나 이상 (!@#$...)', pw_no_common: '일반적인 비밀번호 아님',
+    pw_no_spaces: '앞뒤 공백 없음', pw_match: '비밀번호 일치',
+    pw_strength: '강도', weak: '약함', fair: '보통', good: '좋음', strong: '강함',
+    err_match: '비밀번호가 일치하지 않습니다', err_weak: '비밀번호가 요구사항을 충족하지 않습니다',
+    err_email: '유효한 이메일을 입력하세요', err_generic: '오류가 발생했습니다. 다시 시도하세요.',
+    err_exists: '이 이메일로 이미 계정이 있습니다. 로그인하세요.',
+    nist_note: '귀하의 계정은 기업 수준의 보안 표준으로 보호됩니다.',
+    loading_countries: '국가 로딩 중...',
+  },
+  tr: {
+    step_lang: 'Dilinizi secin', step_lang_sub: 'Bunu ayarlardan istediginiz zaman degistirebilirsiniz.',
+    title: 'Hesabinizi olusturun', sub: "GigWrench'e katilin - ucretsiz baslayin",
+    role_q: 'Olarak katiliyorum...', role_pro: 'Pro - hizmet sunuyorum', role_cust: 'Musteri - hizmet ihtiyacim var',
+    country_label: 'Ulke', currency_label: 'Para birimi',
+    first: 'Ad', last: 'Soyad', email: 'E-posta adresi', password: 'Sifre', confirm: 'Sifreyi onayla',
+    show: 'Goster', hide: 'Gizle', creating: 'Hesap olusturuluyor...', create: 'Hesap olustur',
+    or: 'veya devam et', google: 'Google ile devam et',
+    have_account: 'Zaten hesabiniz var mi?', signin: 'Giris yap',
+    terms_pre: 'Hesap olusturarak kabul ediyorsunuz', terms: 'Kullanim Sartlari', and: 've', privacy: 'Gizlilik Politikasi',
+    pw_title: 'Guvenlik gereksinimleri', pw_length: 'Minimum 12 karakter', pw_upper: 'En az bir buyuk harf (A-Z)',
+    pw_lower: 'En az bir kucuk harf (a-z)', pw_number: 'En az bir rakam (0-9)',
+    pw_special: 'En az bir ozel karakter (!@#$...)', pw_no_common: 'Yaygin bir sifre degil',
+    pw_no_spaces: 'Basta veya sonda bosluk yok', pw_match: 'Sifreler eslesiyor',
+    pw_strength: 'Guc', weak: 'Zayif', fair: 'Orta', good: 'Iyi', strong: 'Guclu',
+    err_match: 'Sifreler eslesmiyor', err_weak: 'Sifre gereksinimleri karsilanmiyor',
+    err_email: 'Gecerli bir e-posta adresi girin', err_generic: 'Bir seyler yanlis gitti. Tekrar deneyin.',
+    err_exists: 'Bu e-posta ile zaten bir hesap var. Giris yapin.',
+    nist_note: 'Hesabiniz kurumsal duzeyde guvenlik standartlariyla korunmaktadir.',
+    loading_countries: 'Ulkeler yukleniyor...',
+  },
+  de: {
+    step_lang: 'Sprache wahlen', step_lang_sub: 'Sie konnen dies jederzeit in den Einstellungen andern.',
+    title: 'Konto erstellen', sub: 'GigWrench beitreten - kostenlos starten',
+    role_q: 'Ich trete bei als...', role_pro: 'Pro - ich biete Dienste an', role_cust: 'Kunde - ich benotige Dienste',
+    country_label: 'Land', currency_label: 'Wahrung',
+    first: 'Vorname', last: 'Nachname', email: 'E-Mail-Adresse', password: 'Passwort', confirm: 'Passwort bestatigen',
+    show: 'Anzeigen', hide: 'Verbergen', creating: 'Konto wird erstellt...', create: 'Konto erstellen',
+    or: 'oder weiter mit', google: 'Mit Google fortfahren',
+    have_account: 'Haben Sie bereits ein Konto?', signin: 'Anmelden',
+    terms_pre: 'Mit der Kontoerstellung stimmen Sie unseren', terms: 'Nutzungsbedingungen', and: 'und', privacy: 'Datenschutzrichtlinie',
+    pw_title: 'Sicherheitsanforderungen', pw_length: 'Mindestens 12 Zeichen', pw_upper: 'Mindestens ein Grossbuchstabe (A-Z)',
+    pw_lower: 'Mindestens ein Kleinbuchstabe (a-z)', pw_number: 'Mindestens eine Zahl (0-9)',
+    pw_special: 'Mindestens ein Sonderzeichen (!@#$...)', pw_no_common: 'Kein gangiges Passwort',
+    pw_no_spaces: 'Keine Leerzeichen am Anfang oder Ende', pw_match: 'Passworter stimmen uberein',
+    pw_strength: 'Starke', weak: 'Schwach', fair: 'Mittel', good: 'Gut', strong: 'Stark',
+    err_match: 'Passworter stimmen nicht uberein', err_weak: 'Passwort erfullt nicht die Anforderungen',
+    err_email: 'Bitte geben Sie eine gultige E-Mail-Adresse ein', err_generic: 'Etwas ist schiefgelaufen. Bitte erneut versuchen.',
+    err_exists: 'Ein Konto mit dieser E-Mail existiert bereits. Bitte melden Sie sich an.',
+    nist_note: 'Ihr Konto ist durch professionelle Sicherheitsstandards geschutzt.',
+    loading_countries: 'Lander werden geladen...',
+  },
+  it: {
+    step_lang: 'Scegli la tua lingua', step_lang_sub: 'Puoi cambiarlo in qualsiasi momento nelle impostazioni.',
+    title: 'Crea il tuo account', sub: 'Unisciti a GigWrench - gratis per iniziare',
+    role_q: 'Mi unisco come...', role_pro: 'Pro - offro servizi', role_cust: 'Cliente - ho bisogno di servizi',
+    country_label: 'Paese', currency_label: 'Valuta',
+    first: 'Nome', last: 'Cognome', email: 'Indirizzo email', password: 'Password', confirm: 'Conferma password',
+    show: 'Mostra', hide: 'Nascondi', creating: 'Creazione account...', create: 'Crea account',
+    or: 'o continua con', google: 'Continua con Google',
+    have_account: 'Hai gia un account?', signin: 'Accedi',
+    terms_pre: 'Creando un account accetti i nostri', terms: 'Termini di servizio', and: 'e', privacy: 'Informativa sulla privacy',
+    pw_title: 'Requisiti di sicurezza', pw_length: 'Minimo 12 caratteri', pw_upper: 'Almeno una lettera maiuscola (A-Z)',
+    pw_lower: 'Almeno una lettera minuscola (a-z)', pw_number: 'Almeno un numero (0-9)',
+    pw_special: 'Almeno un carattere speciale (!@#$...)', pw_no_common: 'Non e una password comune',
+    pw_no_spaces: "Nessuno spazio all'inizio o alla fine", pw_match: 'Le password corrispondono',
+    pw_strength: 'Forza', weak: 'Debole', fair: 'Discreta', good: 'Buona', strong: 'Forte',
+    err_match: 'Le password non corrispondono', err_weak: 'La password non soddisfa i requisiti',
+    err_email: 'Inserisci un indirizzo email valido', err_generic: 'Qualcosa e andato storto. Riprova.',
+    err_exists: 'Esiste gia un account con questa email. Accedi.',
+    nist_note: 'Il tuo account e protetto da standard di sicurezza professionali.',
+    loading_countries: 'Caricamento paesi...',
+  },
+  nl: {
+    step_lang: 'Kies uw taal', step_lang_sub: 'U kunt dit op elk moment wijzigen in de instellingen.',
+    title: 'Maak uw account aan', sub: 'Doe mee met GigWrench - gratis beginnen',
+    role_q: 'Ik doe mee als...', role_pro: 'Pro - ik bied diensten aan', role_cust: 'Klant - ik heb diensten nodig',
+    country_label: 'Land', currency_label: 'Valuta',
+    first: 'Voornaam', last: 'Achternaam', email: 'E-mailadres', password: 'Wachtwoord', confirm: 'Wachtwoord bevestigen',
+    show: 'Tonen', hide: 'Verbergen', creating: 'Account aanmaken...', create: 'Account aanmaken',
+    or: 'of doorgaan met', google: 'Doorgaan met Google',
+    have_account: 'Heeft u al een account?', signin: 'Aanmelden',
+    terms_pre: 'Door een account aan te maken gaat u akkoord met onze', terms: 'Servicevoorwaarden', and: 'en', privacy: 'Privacybeleid',
+    pw_title: 'Beveiligingsvereisten', pw_length: 'Minimaal 12 tekens', pw_upper: 'Minimaal een hoofdletter (A-Z)',
+    pw_lower: 'Minimaal een kleine letter (a-z)', pw_number: 'Minimaal een cijfer (0-9)',
+    pw_special: 'Minimaal een speciaal teken (!@#$...)', pw_no_common: 'Geen veelgebruikt wachtwoord',
+    pw_no_spaces: 'Geen spaties aan het begin of einde', pw_match: 'Wachtwoorden komen overeen',
+    pw_strength: 'Sterkte', weak: 'Zwak', fair: 'Matig', good: 'Goed', strong: 'Sterk',
+    err_match: 'Wachtwoorden komen niet overeen', err_weak: 'Wachtwoord voldoet niet aan de vereisten',
+    err_email: 'Voer een geldig e-mailadres in', err_generic: 'Er is iets misgegaan. Probeer het opnieuw.',
+    err_exists: 'Er bestaat al een account met dit e-mailadres. Meld u aan.',
+    nist_note: 'Uw account is beschermd door professionele beveiligingsnormen.',
+    loading_countries: 'Landen laden...',
+  },
+  ro: {
+    step_lang: 'Alege-ti limba', step_lang_sub: 'Poti schimba asta oricand din setari.',
+    title: 'Creeaza-ti contul', sub: 'Alatura-te GigWrench - gratis pentru inceput',
+    role_q: 'Ma alatur ca...', role_pro: 'Pro - ofer servicii', role_cust: 'Client - am nevoie de servicii',
+    country_label: 'Tara', currency_label: 'Moneda',
+    first: 'Prenume', last: 'Nume', email: 'Adresa de email', password: 'Parola', confirm: 'Confirma parola',
+    show: 'Arata', hide: 'Ascunde', creating: 'Se creeaza contul...', create: 'Creeaza cont',
+    or: 'sau continua cu', google: 'Continua cu Google',
+    have_account: 'Ai deja un cont?', signin: 'Conecteaza-te',
+    terms_pre: 'Prin crearea unui cont esti de acord cu', terms: 'Termenii de serviciu', and: 'si', privacy: 'Politica de confidentialitate',
+    pw_title: 'Cerinte de securitate', pw_length: 'Minimum 12 caractere', pw_upper: 'Cel putin o litera mare (A-Z)',
+    pw_lower: 'Cel putin o litera mica (a-z)', pw_number: 'Cel putin o cifra (0-9)',
+    pw_special: 'Cel putin un caracter special (!@#$...)', pw_no_common: 'Nu e o parola comuna',
+    pw_no_spaces: 'Fara spatii la inceput sau la sfarsit', pw_match: 'Parolele se potrivesc',
+    pw_strength: 'Putere', weak: 'Slab', fair: 'Mediu', good: 'Bun', strong: 'Puternic',
+    err_match: 'Parolele nu se potrivesc', err_weak: 'Parola nu indeplineste cerintele',
+    err_email: 'Introduceti o adresa de email valida', err_generic: 'Ceva a mers prost. Incercati din nou.',
+    err_exists: 'Exista deja un cont cu acest email. Conectati-va.',
+    nist_note: 'Contul tau este protejat de standarde de securitate la nivel enterprise.',
+    loading_countries: 'Se incarca tarile...',
+  },
+  sv: {
+    step_lang: 'Valj ditt sprak', step_lang_sub: 'Du kan andra detta nar som helst i installningarna.',
+    title: 'Skapa ditt konto', sub: 'Gå med i GigWrench - gratis att borja',
+    role_q: 'Jag ansluter som...', role_pro: 'Pro - jag erbjuder tjanster', role_cust: 'Kund - jag behover tjanster',
+    country_label: 'Land', currency_label: 'Valuta',
+    first: 'Fornamn', last: 'Efternamn', email: 'E-postadress', password: 'Losenord', confirm: 'Bekrafta losenord',
+    show: 'Visa', hide: 'Dold', creating: 'Skapar konto...', create: 'Skapa konto',
+    or: 'eller fortsatt med', google: 'Fortsatt med Google',
+    have_account: 'Har du redan ett konto?', signin: 'Logga in',
+    terms_pre: 'Genom att skapa ett konto godkanner du vara', terms: 'Anvandningsvillkor', and: 'och', privacy: 'Integritetspolicy',
+    pw_title: 'Sakerhetsrav', pw_length: 'Minst 12 tecken', pw_upper: 'Minst en stor bokstav (A-Z)',
+    pw_lower: 'Minst en liten bokstav (a-z)', pw_number: 'Minst en siffra (0-9)',
+    pw_special: 'Minst ett specialtecken (!@#$...)', pw_no_common: 'Inte ett vanligt losenord',
+    pw_no_spaces: 'Inga mellanslag i borjan eller slutet', pw_match: 'Losenorden stammer overens',
+    pw_strength: 'Styrka', weak: 'Svagt', fair: 'Okej', good: 'Bra', strong: 'Starkt',
+    err_match: 'Losenorden stammer inte overens', err_weak: 'Losenordet uppfyller inte kraven',
+    err_email: 'Ange en giltig e-postadress', err_generic: 'Nagot gick fel. Forsok igen.',
+    err_exists: 'Det finns redan ett konto med denna e-post. Logga in.',
+    nist_note: 'Ditt konto skyddas av sakerhetsstandarder pa foretagsniva.',
+    loading_countries: 'Laddar lander...',
   },
 }
 
@@ -53,9 +319,9 @@ const PW_CHECKS = [
   { key: 'upper',    labelKey: 'pw_upper',    test: (pw: string) => /[A-Z]/.test(pw) },
   { key: 'lower',    labelKey: 'pw_lower',    test: (pw: string) => /[a-z]/.test(pw) },
   { key: 'number',   labelKey: 'pw_number',   test: (pw: string) => /[0-9]/.test(pw) },
-  { key: 'special',  labelKey: 'pw_special',  test: (pw: string) => /[!@#$%^&*()_+\-=\[\]{};':"|,.<>/?~]/.test(pw) },
-  { key: 'common',   labelKey: 'pw_no_common',test: (pw: string) => !COMMON_PASSWORDS.has(pw.toLowerCase()) },
-  { key: 'spaces',   labelKey: 'pw_no_spaces',test: (pw: string) => pw === pw.trim() },
+  { key: 'special',  labelKey: 'pw_special',  test: (pw: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(pw) },
+  { key: 'common',   labelKey: 'pw_no_common', test: (pw: string) => !COMMON_PASSWORDS.has(pw.toLowerCase()) },
+  { key: 'spaces',   labelKey: 'pw_no_spaces', test: (pw: string) => pw === pw.trim() },
 ]
 
 function getStrength(pw: string) {
@@ -66,7 +332,7 @@ function getStrength(pw: string) {
   if (/[A-Z]/.test(pw)) score++
   if (/[a-z]/.test(pw)) score++
   if (/[0-9]/.test(pw)) score++
-  if (/[!@#$%^&*()_+\-=\[\]{};':"|,.<>/?~]/.test(pw)) score++
+  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(pw)) score++
   if (!COMMON_PASSWORDS.has(pw.toLowerCase())) score++
   return Math.min(4, Math.floor(score / 1.75))
 }
@@ -78,10 +344,17 @@ const STRENGTH_CONFIG = [
   { color: 'bg-green-400',  textKey: 'strong' },
 ]
 
+type CountryRow = { country_code: string; country_name: string; currency_code: string; currency_symbol: string }
+
 export default function SignupPage() {
-  const [lang, setLang] = useState('en')
+  const [langChosen, setLangChosen] = useState(false)
+  const [lang, setLang] = useState<Language>('en')
   const [role, setRole] = useState('pro')
   const [country, setCountry] = useState('US')
+  const [currencyCode, setCurrencyCode] = useState('USD')
+  const [currencySymbol, setCurrencySymbol] = useState('$')
+  const [countries, setCountries] = useState<CountryRow[]>([])
+  const [countriesLoading, setCountriesLoading] = useState(true)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -95,19 +368,55 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [agreedTerms, setAgreedTerms] = useState(false)
   const router = useRouter()
-  const ui = UI[lang as keyof typeof UI] || UI.en
+  const ui = UI[lang] || UI.en
 
+  // On mount: read persisted lang from landing page or previous session
   useEffect(() => {
-    const saved = localStorage.getItem('gw_lang')
-    if (saved && UI[saved as keyof typeof UI]) setLang(saved)
+    const saved = localStorage.getItem('gw_lang') as Language | null
+    if (saved && UI[saved]) {
+      setLang(saved)
+      setLangChosen(true)
+    }
   }, [])
+
+  // Load countries from Supabase country_currencies table
+  useEffect(() => {
+    async function loadCountries() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('country_currencies')
+        .select('country_code, country_name, currency_code, currency_symbol')
+        .order('country_name', { ascending: true })
+      if (data && data.length > 0) {
+        setCountries(data as CountryRow[])
+        // Set default currency from US row
+        const us = (data as CountryRow[]).find(c => c.country_code === 'US')
+        if (us) { setCurrencyCode(us.currency_code); setCurrencySymbol(us.currency_symbol) }
+      }
+      setCountriesLoading(false)
+    }
+    loadCountries()
+  }, [])
+
+  // When country changes, auto-populate currency
+  function handleCountryChange(code: string) {
+    setCountry(code)
+    const row = countries.find(c => c.country_code === code)
+    if (row) { setCurrencyCode(row.currency_code); setCurrencySymbol(row.currency_symbol) }
+  }
+
+  function chooseLang(code: Language) {
+    setLang(code)
+    localStorage.setItem('gw_lang', code)
+    setLangChosen(true)
+  }
 
   const pwResults = PW_CHECKS.map(c => ({ ...c, passed: c.test(password) }))
   const confirmPassed = confirm.length > 0 && password === confirm
   const allPwPassed = pwResults.every(r => r.passed)
   const strength = getStrength(password)
   const strengthConfig = STRENGTH_CONFIG[strength - 1]
-  const emailValid = /^[^s@]+@[^s@]+.[^s@]+$/.test(email)
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   async function handleGoogleSignup() {
     setGoogleLoading(true)
@@ -143,6 +452,8 @@ export default function SignupPage() {
           role,
           language: lang,
           country,
+          currency_code: currencyCode,
+          currency_symbol: currencySymbol,
           signup_method: 'email',
           signup_at: new Date().toISOString(),
         },
@@ -162,6 +473,43 @@ export default function SignupPage() {
     router.push(`/verify-email?email=${encodeURIComponent(email)}`)
   }
 
+  // LANGUAGE SELECTION SCREEN
+  if (!langChosen) {
+    return (
+      <div className="min-h-screen bg-[#07090D] flex flex-col items-center justify-center px-4 py-16">
+        <div className="w-full max-w-2xl">
+          <div className="flex items-center justify-center mb-10">
+            <div className="w-10 h-10 rounded-xl bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center mr-3">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M3 14L7 6L10 11L13 5L16 10" stroke="#F5C518" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="7" cy="6" r="1.5" fill="#FF6B2B"/>
+              </svg>
+            </div>
+            <span className="font-display text-2xl tracking-widest text-white">GIG<span className="text-yellow-400">WRENCH</span></span>
+          </div>
+          <h2 className="text-center text-white text-2xl font-bold mb-2">Choose your language</h2>
+          <p className="text-center text-white/40 text-sm font-mono mb-8">You can change this any time in settings.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {LANG_ORDER.map(code => {
+              const meta = LANGUAGES[code]
+              return (
+                <button
+                  key={code}
+                  onClick={() => chooseLang(code)}
+                  className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-white/8 bg-[#131C28] hover:border-yellow-400/40 hover:bg-yellow-400/5 transition-all text-left"
+                >
+                  <span className="text-xl">{meta.flag}</span>
+                  <span className="text-white/70 text-sm font-medium">{meta.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // MAIN SIGNUP FORM
   return (
     <div className="min-h-screen bg-[#07090D] flex flex-col">
       <nav className="flex items-center justify-between px-8 py-4 border-b border-white/5">
@@ -174,12 +522,15 @@ export default function SignupPage() {
           </div>
           <span className="font-display text-xl tracking-widest text-white">GIG<span className="text-yellow-400">WRENCH</span></span>
         </Link>
-        <div className="flex gap-1">
-          {LANGS.map(l => (
-            <button key={l.code} onClick={() => { setLang(l.code); localStorage.setItem('gw_lang', l.code) }}
-              className={`px-2 py-1 rounded text-xs transition-all ${lang === l.code ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/25' : 'text-white/30 hover:text-white/60'}`}
-              title={l.label}>{l.flag}</button>
-          ))}
+        <div className="flex gap-1 flex-wrap justify-end">
+          {LANG_ORDER.map(code => {
+            const meta = LANGUAGES[code]
+            return (
+              <button key={code} onClick={() => chooseLang(code)}
+                className={`px-2 py-1 rounded text-xs transition-all ${lang === code ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/25' : 'text-white/30 hover:text-white/60'}`}
+                title={meta.label}>{meta.flag}</button>
+            )
+          })}
         </div>
       </nav>
       <div className="flex-1 flex items-center justify-center px-4 py-12">
@@ -198,7 +549,7 @@ export default function SignupPage() {
                     {role === r && <div className="w-1.5 h-1.5 rounded-full bg-black"/>}
                   </div>
                   <div>
-                           <div className="text-xs font-medium flex items-center justify-center">{r === 'pro' ? <Wrench size={14}/> : <Home size={14}/>}</div>
+                    <div className="text-xs font-medium flex items-center justify-center">{r === 'pro' ? <Wrench size={14}/> : <Home size={14}/>}</div>
                     <div className="text-xs font-mono mt-0.5">{r === 'pro' ? ui.role_pro : ui.role_cust}</div>
                   </div>
                 </button>
@@ -303,34 +654,27 @@ export default function SignupPage() {
                 </button>
               </div>
             </div>
-            {/* Country */}
-            <div className="flex flex-col gap-1.5">
-              <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">
-                Country <span className="text-yellow-400">*</span>
-              </label>
-              <select
-                value={country}
-                onChange={e => setCountry(e.target.value)}
-                required
-                className="bg-[#131C28] border border-white/8 rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-yellow-400/40 transition-colors appearance-none"
-              >
-                <option value="US">United States</option>
-                <option value="GB">United Kingdom</option>
-                <option value="CA">Canada</option>
-                <option value="AU">Australia</option>
-                <option value="MX">Mexico</option>
-                <option value="BR">Brazil</option>
-                <option value="FR">France</option>
-                <option value="DE">Germany</option>
-                <option value="PL">Poland</option>
-                <option value="PH">Philippines</option>
-                <option value="IN">India</option>
-                <option value="SA">Saudi Arabia</option>
-                <option value="AE">UAE</option>
-                <option value="RU">Russia</option>
-                <option value="CN">China</option>
-                <option value="OTHER">Other</option>
-              </select>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">{ui.country_label} <span className="text-yellow-400">*</span></label>
+                {countriesLoading ? (
+                  <div className="bg-[#131C28] border border-white/8 rounded-lg px-4 py-3 text-white/30 text-sm font-mono">{ui.loading_countries}</div>
+                ) : (
+                  <select value={country} onChange={e => handleCountryChange(e.target.value)} required
+                    className="bg-[#131C28] border border-white/8 rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-yellow-400/40 transition-colors appearance-none">
+                    {countries.map(c => (
+                      <option key={c.country_code} value={c.country_code}>{c.country_name}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">{ui.currency_label}</label>
+                <div className="bg-[#0C1520] border border-white/6 rounded-lg px-4 py-3 text-white/50 text-sm font-mono flex items-center gap-2">
+                  <span className="text-yellow-400 font-bold">{currencySymbol}</span>
+                  <span>{currencyCode}</span>
+                </div>
+              </div>
             </div>
             <div className="flex items-start gap-3 mt-1">
               <button type="button" onClick={() => setAgreedTerms(!agreedTerms)}
