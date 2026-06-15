@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
           language: meta?.language || 'en',
           country: meta?.country || 'US',
           currency_code: meta?.currency_code || 'USD',
-          currency_symbol: meta?.currency_symbol || '
+          currency_symbol: meta?.currency_symbol || '',
 
         // Create role-specific profile
         if (userRole === 'pro') {
