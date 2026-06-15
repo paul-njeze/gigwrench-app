@@ -11,22 +11,26 @@ import {
 // ─── LANGUAGES ───────────────────────────────────────────────────────────────
 const LANGS = [
   { code: 'en', label: 'English' },
-  { code: 'es', label: 'Espanol' },
-  { code: 'pt', label: 'Portugues' },
-  { code: 'fr', label: 'Francais' },
-  { code: 'pl', label: 'Polski' },
+  { code: 'es', label: 'Español' },
+  { code: 'pt', label: 'Português' },
+  { code: 'fr', label: 'Français' },
   { code: 'ar', label: 'العربية' },
-  { code: 'tl', label: 'Tagalog' },
-  { code: 'ru', label: 'Russkiy' },
   { code: 'zh', label: '中文' },
-  { code: 'hi', label: 'Hindi' },
+  { code: 'hi', label: 'हिन्दी' },
+  { code: 'ko', label: '한국어' },
+  { code: 'tr', label: 'Türkçe' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'nl', label: 'Nederlands' },
+  { code: 'ro', label: 'Română' },
+  { code: 'sv', label: 'Svenska' },
 ]
 
 // ─── COPY ─────────────────────────────────────────────────────────────────────
 const COPY: Record<string, Record<string, string>> = {
   en: {
     pick_lang: 'Choose your language',
-    pick_sub: 'GigWrench is available in 10 languages for Pros and customers worldwide.',
+    pick_sub: 'GigWrench is available in 14 languages for Pros and customers worldwide.',
     skip: 'Continue in English',
     nav_signin: 'Sign In',
     nav_cta: 'Get Started Free',
@@ -369,7 +373,7 @@ const FAQ_PROS = [
   { q: 'Do I need to be a tech expert to use GigWrench?', a: 'No. If you can send a text, you can use GigWrench. The interface is built for Pros, not software engineers.' },
   { q: 'Does GigWrench take a cut of my earnings?', a: 'Never. Your earnings are yours. We charge a flat monthly fee. Stripe processes payments directly to your account.' },
   { q: 'What is GigWrench Lens?', a: 'Lens uses your phone camera and AI to identify any part instantly. It shows you what the part is, where to source it, and lets you add it to an invoice in one tap. No other platform offers this.' },
-  { q: 'What languages is GigWrench available in?', a: 'English, Spanish, Portuguese, French, Polish, Arabic, Tagalog, Russian, Chinese, and Hindi. The full app and booking pages work in all 10 languages.' },
+  { q: 'What languages is GigWrench available in?', a: 'English, Spanish, Portuguese, French, Polish, Arabic, Tagalog, Russian, Chinese, and Hindi. The full app and booking pages work in all 14 languages.' },
 ]
 
 const FAQ_CUSTOMERS = [
