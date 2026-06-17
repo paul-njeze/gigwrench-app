@@ -370,8 +370,16 @@ export default function SignupPage() {
   const router = useRouter()
   const ui = UI[lang] || UI.en
 
-  // On mount: read persisted lang from landing page or previous session
+  // On mount: read lang from URL param first (set by landing page), then localStorage
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const urlLang = params.get('lang') as Language | null
+    if (urlLang && UI[urlLang]) {
+      setLang(urlLang)
+      setLangChosen(true)
+      localStorage.setItem('gw_lang', urlLang)
+      return
+    }
     const saved = localStorage.getItem('gw_lang') as Language | null
     if (saved && UI[saved]) {
       setLang(saved)
