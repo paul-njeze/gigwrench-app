@@ -57,11 +57,16 @@ export default function DispatchWidget() {
   const isRtl = lang === 'ar'
 
   useEffect(() => {
+    // Read lang from URL param first (set by landing page on signup links)
+    const params = new URLSearchParams(window.location.search)
+    const urlLang = params.get('lang')
     const saved = localStorage.getItem('gw_lang')
-    if (saved && UI[saved]) {
-      setLang(saved)
+    const code = (urlLang && UI[urlLang]) ? urlLang : (saved && UI[saved]) ? saved : null
+    if (code) {
+      setLang(code)
       setStage('chat')
-      setMessages([{ role: 'assistant', content: (UI[saved] || UI.en).greeting }])
+      setMessages([{ role: 'assistant', content: (UI[code] || UI.en).greeting }])
+      if (urlLang && UI[urlLang]) localStorage.setItem('gw_lang', urlLang)
     }
   }, [])
 
