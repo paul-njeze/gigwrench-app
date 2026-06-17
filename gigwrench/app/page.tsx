@@ -496,6 +496,8 @@ export default function LandingPage() {
     localStorage.setItem('gw_picker_shown', '1')
   }
 
+  const signupHref = `/signup?lang=${lang}`
+
   return (
     <div className="min-h-screen bg-gw-bg text-gw-text" dir={isRtl ? 'rtl' : 'ltr'}>
 
@@ -514,7 +516,7 @@ export default function LandingPage() {
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/login" className="font-mono text-sm text-white/50 hover:text-white transition-colors no-underline hidden sm:block">{c.nav_signin}</Link>
-          <Link href="/signup" className="bg-yellow-400 text-black font-mono font-bold text-xs tracking-widest px-5 py-2.5 rounded-xl hover:bg-yellow-300 transition-colors no-underline uppercase">{c.nav_cta}</Link>
+          <Link href={signupHref} className="bg-yellow-400 text-black font-mono font-bold text-xs tracking-widest px-5 py-2.5 rounded-xl hover:bg-yellow-300 transition-colors no-underline uppercase">{c.nav_cta}</Link>
         </div>
       </nav>
 
@@ -530,7 +532,7 @@ export default function LandingPage() {
         </h1>
         <p className="text-white/50 text-lg md:text-xl font-body leading-relaxed max-w-2xl mb-10">{c.hero_sub}</p>
         <div className="flex flex-wrap gap-4 mb-16">
-          <Link href="/signup" className="bg-yellow-400 text-black font-mono font-bold text-sm tracking-widest px-8 py-4 rounded-2xl hover:bg-yellow-300 transition-colors no-underline uppercase inline-flex items-center gap-2">
+          <Link href={signupHref} className="bg-yellow-400 text-black font-mono font-bold text-sm tracking-widest px-8 py-4 rounded-2xl hover:bg-yellow-300 transition-colors no-underline uppercase inline-flex items-center gap-2">
             {c.hero_cta1}
           </Link>
           <a href="#features" className="border border-white/15 text-white/70 font-mono text-sm px-8 py-4 rounded-2xl hover:border-white/30 hover:text-white transition-colors no-underline">
@@ -679,7 +681,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <Link href="/signup" className="inline-flex items-center gap-2 bg-yellow-400 text-black font-mono font-bold text-sm tracking-widest px-8 py-4 rounded-2xl hover:bg-yellow-300 transition-colors no-underline uppercase">
+          <Link href={signupHref} className="inline-flex items-center gap-2 bg-yellow-400 text-black font-mono font-bold text-sm tracking-widest px-8 py-4 rounded-2xl hover:bg-yellow-300 transition-colors no-underline uppercase">
             {c.app_beta}
           </Link>
         </div>
@@ -702,7 +704,7 @@ export default function LandingPage() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
-            <Link href="/signup" className="font-mono text-xs text-white/40 hover:text-white/70 transition-colors no-underline">Sign Up</Link>
+            <Link href={signupHref} className="font-mono text-xs text-white/40 hover:text-white/70 transition-colors no-underline">Sign Up</Link>
             <Link href="/login" className="font-mono text-xs text-white/40 hover:text-white/70 transition-colors no-underline">Sign In</Link>
             <Link href="/terms" className="font-mono text-xs text-white/40 hover:text-white/70 transition-colors no-underline">Terms</Link>
             <Link href="/privacy" className="font-mono text-xs text-white/40 hover:text-white/70 transition-colors no-underline">Privacy</Link>
