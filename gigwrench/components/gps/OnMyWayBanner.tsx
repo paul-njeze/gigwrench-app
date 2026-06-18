@@ -45,29 +45,33 @@ export default function OnMyWayBanner() {
 
   const trackingUrl = job ? `${TRACKING_BASE}/${job.id}` : ''
 
-  // Load the Pro's active On My Way trip, if any.
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data } = await supabase
-        .from('jobs')
-        .select('id,title,lat,lng')
-        .eq('pro_id', user.id)
-        .eq('status', 'on_the_way')
-        .is('arrived_at', null)
-        .order('on_the_way_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-      if (!cancelled && data) setJob(data as ActiveJob)
-    }
-    load()
-    return () => {
-      cancelled = true
+  const loadActiveTrip = useCallback(async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase
+      .from('jobs')
+      .select('id,title,lat,lng')
+      .eq('pro_id', user.id)
+      .eq('status', 'on_the_way')
+      .is('arrived_at', null)
+      .order('on_the_way_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (data) {
+      setJob(data as ActiveJob)
+      setArrived(false)
+      arrivedFiredRef.current = false
     }
   }, [])
+
+  // Load on mount and whenever a trip is started elsewhere in the app.
+  useEffect(() => {
+    loadActiveTrip()
+    const onStart = () => loadActiveTrip()
+    window.addEventListener('gw:omw-started', onStart)
+    return () => window.removeEventListener('gw:omw-started', onStart)
+  }, [loadActiveTrip])
 
   const fireArrived = useCallback(async () => {
     if (arrivedFiredRef.current || !job) return
