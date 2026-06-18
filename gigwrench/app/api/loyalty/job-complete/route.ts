@@ -131,10 +131,13 @@ export async function POST(req: NextRequest) {
     const amount = job.final_amount || job.quoted_amount
 
     const { data: customer } = await supabase
-      .from('customers')
-      .select('name,phone,email')
+      .from('profiles')
+      .select('first_name,last_name,phone,email,notification_prefs')
       .eq('id', job.customer_id)
       .single()
+
+    const customerName = customer ? `${customer.first_name ?? ''} ${customer.last_name ?? ''}`.trim() || 'there' : 'there'
+    const prefs = (customer?.notification_prefs ?? {}) as Record<string, boolean>
 
     const category = getTradeCategory(job.title, job.description)
 
@@ -146,7 +149,7 @@ export async function POST(req: NextRequest) {
     const results: string[] = []
 
     // SMS
-    if (customer?.phone) {
+    if (customer?.phone && process.env.SMS_ENABLED === 'true' && prefs.sms_job_complete !== false) {
       try {
         const smsBody = `GigWrench: Your ${job.title} job is complete! Thanks for choosing ${proName}. Need help again? Book at: gigwrench-app.vercel.app/book/${pro.id}`
         await sendTwilioSMS(customer.phone, smsBody)
@@ -171,10 +174,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Email
-    if (customer?.email) {
+    if (customer?.email && prefs.email_job_complete !== false) {
       try {
         const emailHtml = buildCompletionEmail(
-          customer.name,
+          customerName,
           proName,
           job.title,
           amount,
@@ -191,7 +194,7 @@ export async function POST(req: NextRequest) {
           body: JSON.stringify({
             from: 'dispatch@gigwrench.app',
             to: customer.email,
-            subject: `Your ${job.title} job is complete -- GigWrench`,
+            subject: `GigWrench: Your ${job.title} job is complete`,
             html: emailHtml,
           }),
         })
