@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/lang'
 
 import Link from 'next/link'
-import LocationBroadcaster from '@/components/gps/LocationBroadcaster'
+import GpsConsentModal from '@/components/gps/GpsConsentModal'
 
 import {
 
@@ -86,6 +86,73 @@ export default function JobsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
   const [showFilter, setShowFilter] = useState(false)
+
+  const [consentJob, setConsentJob] = useState<Job | null>(null)
+
+  const [omwError, setOmwError] = useState<string | null>(null)
+
+  const [omwStartingId, setOmwStartingId] = useState<string | null>(null)
+
+  function proceedOnMyWay(job: Job) {
+    setOmwError(null)
+    if (!navigator.geolocation) {
+      setOmwError(t('gps_required_enable_location'))
+      return
+    }
+    setOmwStartingId(job.id)
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const supabase = createClient()
+          const { data: { session } } = await supabase.auth.getSession()
+          if (!session) { setOmwStartingId(null); return }
+          await fetch('/api/gps/on-my-way', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+            body: JSON.stringify({ job_id: job.id, lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          })
+          setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'on_the_way' } : j))
+        } finally {
+          setOmwStartingId(null)
+        }
+      },
+      () => {
+        setOmwStartingId(null)
+        setOmwError(t('gps_required_enable_location'))
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
+
+  async function handleOnMyWay(job: Job) {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('gps_consent_given')
+      .eq('id', user.id)
+      .maybeSingle()
+    if (prof && prof.gps_consent_given) {
+      proceedOnMyWay(job)
+    } else {
+      setConsentJob(job)
+    }
+  }
+
+  async function acceptConsent() {
+    const job = consentJob
+    setConsentJob(null)
+    if (!job) return
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase
+      .from('profiles')
+      .update({ gps_consent_given: true, gps_consent_at: new Date().toISOString() })
+      .eq('id', user.id)
+    proceedOnMyWay(job)
+  }
 
   useEffect(() => {
 
@@ -345,9 +412,9 @@ export default function JobsPage() {
 
                       <div className="flex gap-2 mt-3 pt-3 border-t border-white/5">
 
-                        <button onClick={e => e.preventDefault()} className="flex items-center gap-1.5 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 px-3 py-1.5 rounded-lg font-mono text-[10px] uppercase tracking-wider hover:bg-yellow-400/20 transition-colors">
+                        <button onClick={e => { e.preventDefault(); e.stopPropagation(); handleOnMyWay(job) }} disabled={omwStartingId === job.id} className="flex items-center gap-1.5 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 px-3 py-1.5 rounded-lg font-mono text-[10px] uppercase tracking-wider hover:bg-yellow-400/20 transition-colors disabled:opacity-50">
 
-                          <Navigation size={10}/>{t('on_my_way')}
+                          <Navigation size={10}/>{omwStartingId === job.id ? t('on_my_way_starting') : t('on_my_way')}
 
                         </button>
 
@@ -378,9 +445,6 @@ export default function JobsPage() {
                       </div>
 
                     )}
-                    {(job.status === 'confirmed' || job.status === 'in_progress') && (
-                                      <LocationBroadcaster jobId={job.id} jobTitle={job.title} />
-                                    )}
 
                   </Link>
                 ))}
@@ -390,6 +454,26 @@ export default function JobsPage() {
             </div>
 
           ))}
+
+        </div>
+
+      )}
+
+      <GpsConsentModal
+        open={!!consentJob}
+        title={t('gps_consent_title')}
+        body={t('gps_consent_body')}
+        acceptLabel={t('gps_consent_accept')}
+        declineLabel={t('gps_consent_decline')}
+        onAccept={acceptConsent}
+        onDecline={() => setConsentJob(null)}
+      />
+
+      {omwError && (
+
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-red-500/15 border border-red-500/30 text-red-300 px-4 py-2.5 rounded-lg font-mono text-[11px] max-w-sm text-center">
+
+          {omwError}
 
         </div>
 
