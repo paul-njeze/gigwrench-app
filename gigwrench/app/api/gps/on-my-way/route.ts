@@ -28,6 +28,24 @@ async function sendTwilioSMS(to: string, body: string): Promise<void> {
   }
 }
 
+async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(address)}`
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'GigWrench/1.0 (dispatch@gigwrench.app)' },
+    })
+    if (!res.ok) return null
+    const data = (await res.json()) as Array<{ lat: string; lon: string }>
+    if (!data || data.length === 0) return null
+    const gLat = parseFloat(data[0].lat)
+    const gLng = parseFloat(data[0].lon)
+    if (Number.isNaN(gLat) || Number.isNaN(gLng)) return null
+    return { lat: gLat, lng: gLng }
+  } catch {
+    return null
+  }
+}
+
 function buildOnMyWayEmail(
   customerName: string,
   proName: string,
@@ -99,7 +117,7 @@ export async function POST(req: NextRequest) {
     // Load job plus the owning Pro, then verify ownership before any writes.
     const { data: job, error: jErr } = await serviceClient
       .from('jobs')
-      .select('id,title,customer_id,pro_id,pro:profiles!jobs_pro_id_fkey(id,first_name,last_name,phone)')
+      .select('id,title,address,lat,lng,customer_id,pro_id,pro:profiles!jobs_pro_id_fkey(id,first_name,last_name,phone)')
       .eq('id', job_id)
       .single()
 
@@ -113,15 +131,26 @@ export async function POST(req: NextRequest) {
     const nowIso = new Date().toISOString()
 
     // Atomic state write: flip the job into the live On My Way state.
+    const jobUpdate: Record<string, unknown> = {
+      status: 'on_the_way',
+      tracking_active: true,
+      on_the_way_at: nowIso,
+      pro_lat: lat,
+      pro_lng: lng,
+    }
+    // Geocode the destination once if the job has an address but no coordinates,
+    // so automatic arrival detection works. Best effort: never blocks the trip.
+    const jobGeo = job as unknown as { address: string | null; lat: number | null; lng: number | null }
+    if ((jobGeo.lat == null || jobGeo.lng == null) && jobGeo.address) {
+      const geo = await geocodeAddress(jobGeo.address)
+      if (geo) {
+        jobUpdate.lat = geo.lat
+        jobUpdate.lng = geo.lng
+      }
+    }
     const { error: updErr } = await serviceClient
       .from('jobs')
-      .update({
-        status: 'on_the_way',
-        tracking_active: true,
-        on_the_way_at: nowIso,
-        pro_lat: lat,
-        pro_lng: lng,
-      })
+      .update(jobUpdate)
       .eq('id', job_id)
     if (updErr) {
       return NextResponse.json({ error: updErr.message }, { status: 500 })
