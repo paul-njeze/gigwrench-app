@@ -124,18 +124,20 @@ export async function POST(req: NextRequest) {
     const proName = `${pro.first_name} ${pro.last_name}`.trim()
 
     const { data: customer } = await serviceClient
-      .from('customers')
-      .select('name,phone,email')
+      .from('profiles')
+      .select('first_name,last_name,phone,email,notification_prefs')
       .eq('id', job.customer_id)
       .single()
 
     const fired: string[] = []
+    const customerName = customer ? `${customer.first_name ?? ''} ${customer.last_name ?? ''}`.trim() || 'there' : 'there'
+    const prefs = (customer?.notification_prefs ?? {}) as Record<string, boolean>
 
     // Email leg: live.
-    if (customer?.email) {
+    if (customer?.email && prefs.email_on_the_way !== false) {
       try {
         const emailHtml = buildArrivedEmail(
-          customer.name || 'there',
+          customerName,
           proName,
           job.title
         )
@@ -159,12 +161,12 @@ export async function POST(req: NextRequest) {
     }
 
     // SMS leg: dark until SMS_ENABLED is 'true'.
-    if (customer?.phone) {
+    if (customer?.phone && prefs.sms_on_the_way !== false) {
       if (process.env.SMS_ENABLED === 'true') {
         try {
           await sendTwilioSMS(
             customer.phone,
-            `Hi ${customer.name || 'there'}, ${proName} has arrived for your appointment.`
+            `Hi ${customerName}, ${proName} has arrived for your appointment.`
           )
           fired.push('sms_sent')
         } catch {
