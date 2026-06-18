@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { Navigation, Copy, Check, MapPin, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const TRACKING_BASE = 'https://gigwrench-app.vercel.app/track'
+const TRACKING_BASE = 'https://app.gigwrench.app/track'
 const ARRIVAL_THRESHOLD_MI = 0.1
 const POST_INTERVAL_MS = 5000
 
