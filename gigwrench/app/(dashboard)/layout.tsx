@@ -12,6 +12,7 @@ import {
 import VerificationBanner from '@/components/VerificationBanner'
 import OnboardingChat from '@/components/OnboardingChat'
 import TourOverlay from '@/components/TourOverlay'
+import OnMyWayBanner from '@/components/gps/OnMyWayBanner'
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { t, lang, setLang } = useLang()
@@ -133,6 +134,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           <span className="font-display text-lg tracking-widest text-white">GIG<span className="text-yellow-400">WRENCH</span></span>
         </div>
         <VerificationBanner />
+        <OnMyWayBanner />
         {children}
       </main>
     </div>
