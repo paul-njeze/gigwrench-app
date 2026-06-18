@@ -112,6 +112,7 @@ export default function JobsPage() {
             body: JSON.stringify({ job_id: job.id, lat: pos.coords.latitude, lng: pos.coords.longitude }),
           })
           setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'on_the_way' } : j))
+          window.dispatchEvent(new Event('gw:omw-started'))
         } finally {
           setOmwStartingId(null)
         }
