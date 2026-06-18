@@ -185,19 +185,21 @@ export async function POST(req: NextRequest) {
     const proName = `${pro.first_name} ${pro.last_name}`.trim()
 
     const { data: customer } = await serviceClient
-      .from('customers')
-      .select('name,phone,email')
+      .from('profiles')
+      .select('first_name,last_name,phone,email,notification_prefs')
       .eq('id', job.customer_id)
       .single()
 
     const trackingUrl = `${TRACKING_BASE}/${job_id}`
     const fired: string[] = []
+    const customerName = customer ? `${customer.first_name ?? ''} ${customer.last_name ?? ''}`.trim() || 'there' : 'there'
+    const prefs = (customer?.notification_prefs ?? {}) as Record<string, boolean>
 
     // Email leg: live. A mail failure never blocks the trip.
-    if (customer?.email) {
+    if (customer?.email && prefs.email_on_the_way !== false) {
       try {
         const emailHtml = buildOnMyWayEmail(
-          customer.name || 'there',
+          customerName,
           proName,
           job.title,
           trackingUrl
@@ -222,12 +224,12 @@ export async function POST(req: NextRequest) {
     }
 
     // SMS leg: dark until SMS_ENABLED is set to 'true' in Vercel once A2P clears.
-    if (customer?.phone) {
+    if (customer?.phone && prefs.sms_on_the_way !== false) {
       if (process.env.SMS_ENABLED === 'true') {
         try {
           await sendTwilioSMS(
             customer.phone,
-            `Hi ${customer.name || 'there'}, ${proName} is on the way. Track arrival live: ${trackingUrl}`
+            `Hi ${customerName}, ${proName} is on the way. Track arrival live: ${trackingUrl}`
           )
           fired.push('sms_sent')
         } catch {
