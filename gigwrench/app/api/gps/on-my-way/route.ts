@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'edge'
 
-const TRACKING_BASE = 'https://gigwrench-app.vercel.app/track'
+const TRACKING_BASE = 'https://app.gigwrench.app/track'
 
 async function sendTwilioSMS(to: string, body: string): Promise<void> {
   const sid = process.env.TWILIO_ACCOUNT_SID!
