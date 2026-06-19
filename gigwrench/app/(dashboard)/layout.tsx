@@ -158,9 +158,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       // Get user's preferred language
       const { data: profile } = await supabase
         .from('profiles')
-        .select('language, role, first_name, onboarding_completed, tour_completed')
+        .select('language, role, first_name, onboarding_completed, tour_completed, account_status')
         .eq('id', user.id)
         .single()
+      const status = (profile as { account_status?: string } | null)?.account_status
+      if (status === 'suspended' || status === 'disabled') {
+        await supabase.auth.signOut()
+        router.push('/login?status=' + status)
+        return
+      }
       if (profile?.language) setUserLang(profile.language as Language)
       setUserId(user.id)
       setUserName(profile?.first_name || '')
