@@ -181,7 +181,7 @@ export default function DashboardPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <span className={`font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-full border ${STATUS_COLORS[job.status] || STATUS_COLORS.scheduled}`}>
-                        {t(job.status)}
+                        {t(job.status).replace(/_/g, ' ')}
                       </span>
                       <span className="font-mono text-[9px] text-white/25">
                         {new Date(job.scheduled_at).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })}
