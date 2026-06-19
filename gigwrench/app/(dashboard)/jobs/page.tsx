@@ -279,7 +279,7 @@ export default function JobsPage() {
 
           <Filter size={14}/>
 
-          {statusFilter !== 'all' ? statusFilter.replace('_', ' ') : 'Filter'}
+          {statusFilter !== 'all' ? statusFilter.replace(/_/g, ' ') : 'Filter'}
 
         </button>
 
@@ -295,7 +295,7 @@ export default function JobsPage() {
 
               className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all ${statusFilter === s ? 'bg-yellow-400/10 border-yellow-400/30 text-yellow-400' : 'border-white/8 text-white/35 hover:border-white/20 hover:text-white/60'}`}>
 
-              {s === 'all' ? 'All statuses' : s.replace('_', ' ')}
+              {s === 'all' ? 'All statuses' : s.replace(/_/g, ' ')}
 
             </button>
 
@@ -363,7 +363,7 @@ export default function JobsPage() {
 
                           <span className={`font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-full border ${STATUS_COLORS[job.status] || STATUS_COLORS.scheduled}`}>
 
-                            {t(job.status)}
+                            {t(job.status).replace(/_/g, ' ')}
 
                           </span>
 
