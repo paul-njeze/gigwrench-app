@@ -111,6 +111,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'You cannot action your own account' }, { status: 400 })
     }
 
+    // Least privilege: a support-level admin cannot disable accounts.
+    if (action === 'disable' && adminRow.level === 'support') {
+      return NextResponse.json({ error: 'Disabling an account requires a senior admin' }, { status: 403 })
+    }
+
     const nowIso = new Date().toISOString()
     const newStatus = STATUS_FOR[action]
     const untilValue = action === 'suspend' ? (suspended_until ?? null) : null
