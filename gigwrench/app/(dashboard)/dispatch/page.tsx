@@ -116,7 +116,7 @@ export default function DispatchPage() {
                                                                                                                           <div className="flex items-start justify-between gap-3 mb-2">
                                                                                                                                               <span className="font-mono text-sm text-white font-medium">{req.customer_name}</span>
                                                                                                                                               <span className={`font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full flex-shrink-0 ${statusClass}`}>
-                                                                                                                                                {status.replace('_', ' ')}
+                                                                                                                                                {status.replace(/_/g, ' ')}
                                                                                                                                                 </span>
                                                                                                                             </div>
                                                                                                                           <p className="text-white/50 text-sm mb-3 leading-relaxed">{req.job_description}</p>
