@@ -202,7 +202,7 @@ export default function AnalyticsPage() {
                       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }}/>
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
-                          <span className="font-mono text-xs text-white/50 capitalize">{status.replace('_', ' ')}</span>
+                          <span className="font-mono text-xs text-white/50 capitalize">{status.replace(/_/g, ' ')}</span>
                           <span className="font-mono text-xs text-white/70">{count}</span>
                         </div>
                         <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
