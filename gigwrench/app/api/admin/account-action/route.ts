@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { dispatch } from '@/lib/notify'
+import { renderEmail, escapeHtml, FOOTER_TRUST_SAFETY } from '@/lib/notify/shell'
 
 export const runtime = 'edge'
 
@@ -36,27 +38,15 @@ function buildStatusEmail(
     headline = 'Your account has been restored'
     body = 'Your account is active again and you can sign in as normal. Thank you.'
   }
+  const safeName = escapeHtml(name)
   const reasonLine = reason
-    ? `<p style="margin:0 0 16px;font-size:13px;color:#9CA3AF;">Reason: ${reason}</p>`
+    ? `<p style="margin:0 0 16px;font-size:13px;color:#9CA3AF;">Reason: ${escapeHtml(reason)}</p>`
     : ''
-  const html = `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#07090D;font-family:system-ui,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 16px;">
-    <table width="100%" style="max-width:560px;">
-      <tr><td style="padding-bottom:32px;"><p style="margin:0;font-size:22px;font-weight:700;letter-spacing:4px;color:#FFFFFF;">GIG<span style="color:#F5C518;">WRENCH</span></p></td></tr>
-      <tr><td style="background:#131C28;border-radius:16px;padding:32px;border:1px solid #1E2D42;">
-        <p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#F9FAFB;">${headline}</p>
-        <p style="margin:0 0 16px;font-size:14px;color:#9CA3AF;">Hi ${name}, ${body}</p>
+  const cardHtml = `<p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#F9FAFB;">${headline}</p>
+        <p style="margin:0 0 16px;font-size:14px;color:#9CA3AF;">Hi ${safeName}, ${body}</p>
         ${reasonLine}
-        <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">If you have questions, reply to this message or contact support@gigwrench.app.</p>
-      </td></tr>
-      <tr><td style="padding-top:24px;text-align:center;"><p style="margin:0;font-size:11px;color:#374151;">GigWrench Trust and Safety.</p></td></tr>
-    </table>
-  </td></tr></table>
-</body>
-</html>`
+        <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">If you have questions, reply to this message or contact support@gigwrench.app.</p>`
+  const html = renderEmail({ cardHtml, footer: FOOTER_TRUST_SAFETY })
   const subject =
     action === 'restore' ? 'Your GigWrench account has been restored'
     : action === 'warn' ? 'A warning on your GigWrench account'
@@ -152,18 +142,18 @@ export async function POST(req: NextRequest) {
 
     let emailed = false
     if (target?.email) {
-      try {
-        const name = `${target.first_name ?? ''}`.trim() || 'there'
-        const { subject, html } = buildStatusEmail(name, action, reason ?? '', untilValue)
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ from: 'support@gigwrench.app', to: target.email, subject, html }),
-        })
-        emailed = true
-      } catch {
-        emailed = false
-      }
+      const name = `${target.first_name ?? ''}`.trim() || 'there'
+      const { subject, html } = buildStatusEmail(name, action, reason ?? '', untilValue)
+      const result = await dispatch({
+        recipientId: target_id,
+        to: { email: target.email },
+        type: `account_${action}`,
+        critical: true,
+        email: { from: 'support@gigwrench.app', subject, html },
+      })
+      emailed = result.results.some(
+        (r) => r.channel === 'email' && r.status === 'sent'
+      )
     }
 
     return NextResponse.json({ success: true, status: newStatus, emailed })
