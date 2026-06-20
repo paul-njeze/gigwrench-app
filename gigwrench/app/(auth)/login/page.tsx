@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import AuthArtPanel from '@/components/auth/AuthArtPanel'
 
 const LANGS = [
   { code: 'en', flag: '🇺🇸', label: 'English' },
@@ -43,6 +44,7 @@ export default function LoginPage() {
   }
 
   return (
+    <div className="lg:grid lg:grid-cols-2 bg-[#07090D]">
     <div className="min-h-screen bg-[#07090D] flex flex-col">
       <nav className="flex items-center justify-between px-8 py-4 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 no-underline">
@@ -120,6 +122,10 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+    </div>
+    <div className="hidden lg:block relative overflow-hidden bg-[#07090D]">
+      <AuthArtPanel />
+    </div>
     </div>
   )
 }
