@@ -464,6 +464,8 @@ export default function SignupPage() {
           currency_symbol: currencySymbol,
           signup_method: 'email',
           signup_at: new Date().toISOString(),
+          terms_accepted: true,
+          terms_accepted_at: new Date().toISOString(),
         },
       },
     })
