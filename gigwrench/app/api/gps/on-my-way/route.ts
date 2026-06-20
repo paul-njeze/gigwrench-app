@@ -1,32 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { dispatch } from '@/lib/notify'
+import { renderEmail, emailButton, escapeHtml, FOOTER_DISPATCH } from '@/lib/notify/shell'
 
 export const runtime = 'edge'
 
 const TRACKING_BASE = 'https://app.gigwrench.app/track'
-
-async function sendTwilioSMS(to: string, body: string): Promise<void> {
-  const sid = process.env.TWILIO_ACCOUNT_SID!
-  const token = process.env.TWILIO_AUTH_TOKEN!
-  const from = process.env.TWILIO_PHONE_NUMBER!
-  const auth = btoa(`${sid}:${token}`)
-  const params = new URLSearchParams({ From: from, To: to, Body: body })
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${auth}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString(),
-    }
-  )
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Twilio error: ${text}`)
-  }
-}
 
 async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
   try {
@@ -52,30 +31,11 @@ function buildOnMyWayEmail(
   jobTitle: string,
   trackingUrl: string
 ): string {
-  return `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#07090D;font-family:system-ui,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0">
-    <tr><td align="center" style="padding:40px 16px;">
-      <table width="100%" style="max-width:560px;">
-        <tr><td style="padding-bottom:32px;">
-          <p style="margin:0;font-size:22px;font-weight:700;letter-spacing:4px;color:#FFFFFF;">GIG<span style="color:#F5C518;">WRENCH</span></p>
-        </td></tr>
-        <tr><td style="background:#131C28;border-radius:16px;padding:32px;border:1px solid #1E2D42;">
-          <p style="margin:0 0 8px;font-size:24px;font-weight:700;color:#F9FAFB;">Your Pro is on the way</p>
-          <p style="margin:0 0 24px;font-size:14px;color:#6B7280;">Hi ${customerName}, ${proName} is heading to you now for your ${jobTitle} appointment.</p>
-          <a href="${trackingUrl}" style="display:block;background:#F5C518;color:#000000;text-align:center;padding:14px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:24px;">Track arrival live</a>
-          <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">The live map updates as your Pro travels. Keep this page open to watch the arrival in real time.</p>
-        </td></tr>
-        <tr><td style="padding-top:24px;text-align:center;">
-          <p style="margin:0;font-size:11px;color:#374151;">Dispatch by GigWrench. The field service OS for Pros and the people they serve.</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`
+  const cardHtml = `<p style="margin:0 0 8px;font-size:24px;font-weight:700;color:#F9FAFB;">Your Pro is on the way</p>
+          <p style="margin:0 0 24px;font-size:14px;color:#6B7280;">Hi ${escapeHtml(customerName)}, ${escapeHtml(proName)} is heading to you now for your ${escapeHtml(jobTitle)} appointment.</p>
+          ${emailButton('Track arrival live', trackingUrl)}
+          <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">The live map updates as your Pro travels. Keep this page open to watch the arrival in real time.</p>`
+  return renderEmail({ cardHtml, footer: FOOTER_DISPATCH })
 }
 
 export async function POST(req: NextRequest) {
@@ -191,56 +151,30 @@ export async function POST(req: NextRequest) {
       .single()
 
     const trackingUrl = `${TRACKING_BASE}/${job_id}`
-    const fired: string[] = []
     const customerName = customer ? `${customer.first_name ?? ''} ${customer.last_name ?? ''}`.trim() || 'there' : 'there'
     const prefs = (customer?.notification_prefs ?? {}) as Record<string, boolean>
 
-    // Email leg: live. A mail failure never blocks the trip.
-    if (customer?.email && prefs.email_on_the_way !== false) {
-      try {
-        const emailHtml = buildOnMyWayEmail(
-          customerName,
-          proName,
-          job.title,
-          trackingUrl
-        )
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: 'dispatch@gigwrench.app',
-            to: customer.email,
-            subject: `${proName} is on the way`,
-            html: emailHtml,
-          }),
-        })
-        fired.push('email_sent')
-      } catch {
-        fired.push('email_failed')
-      }
-    }
+    // Notifications flow through the spine: email is live, SMS is gated by
+    // SMS_ENABLED, both respect the customer preferences, and the event is
+    // recorded once. The dedupe key makes a double tap a no op.
+    const result = await dispatch({
+      recipientId: job.customer_id,
+      to: { email: customer?.email ?? null, phone: customer?.phone ?? null },
+      type: 'on_my_way',
+      dedupeKey: `on_my_way:${job_id}`,
+      prefKeys: { email: 'email_on_the_way', sms: 'sms_on_the_way' },
+      prefs,
+      email: {
+        from: 'dispatch@gigwrench.app',
+        subject: `${proName} is on the way`,
+        html: buildOnMyWayEmail(customerName, proName, job.title, trackingUrl),
+      },
+      sms: {
+        body: `Hi ${customerName}, ${proName} is on the way. Track arrival live: ${trackingUrl}`,
+      },
+    })
 
-    // SMS leg: dark until SMS_ENABLED is set to 'true' in Vercel once A2P clears.
-    if (customer?.phone && prefs.sms_on_the_way !== false) {
-      if (process.env.SMS_ENABLED === 'true') {
-        try {
-          await sendTwilioSMS(
-            customer.phone,
-            `Hi ${customerName}, ${proName} is on the way. Track arrival live: ${trackingUrl}`
-          )
-          fired.push('sms_sent')
-        } catch {
-          fired.push('sms_failed')
-        }
-      } else {
-        fired.push('sms_skipped')
-      }
-    }
-
-    return NextResponse.json({ success: true, fired })
+    return NextResponse.json({ success: true, fired: result.fired })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     return NextResponse.json({ error: message }, { status: 500 })
