@@ -522,8 +522,9 @@ export default function SignupPage() {
 
   // MAIN SIGNUP FORM
   return (
-    <div className="lg:grid lg:grid-cols-2 bg-[#07090D]">
-    <div className="min-h-screen bg-[#07090D] flex flex-col">
+    <div className="relative min-h-screen bg-[#07090D]">
+    <AuthArtPanel />
+    <div className="relative z-10 min-h-screen flex flex-col">
       <nav className="flex items-center justify-between px-8 py-4 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 no-underline">
           <div className="w-8 h-8 rounded-lg bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center">
@@ -534,19 +535,19 @@ export default function SignupPage() {
           </div>
           <span className="font-display text-xl tracking-widest text-white">GIG<span className="text-yellow-400">WRENCH</span></span>
         </Link>
-        <div className="flex gap-1 flex-wrap justify-end">
+        <div className="flex gap-0.5 flex-wrap justify-end p-1.5 rounded-xl bg-[#07090D]/60 backdrop-blur-md border border-white/12 shadow-lg">
           {LANG_ORDER.map(code => {
             const meta = LANGUAGES[code]
             return (
               <button key={code} onClick={() => chooseLang(code)}
-                className={`px-2 py-1 rounded text-xs transition-all ${lang === code ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/25' : 'text-white/30 hover:text-white/60'}`}
+                className={`px-2.5 py-1.5 rounded-lg text-xs transition-all ${lang === code ? 'bg-yellow-400 text-black font-bold' : 'text-white/80 hover:text-white hover:bg-white/10'}`}
                 title={meta.label}>{meta.flag}</button>
             )
           })}
         </div>
       </nav>
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-lg">
+      <div className="flex-1 flex items-center justify-center lg:justify-start px-4 lg:px-16 py-12">
+        <div className="w-full max-w-lg bg-[#07090D]/72 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
           <div className="mb-8">
             <h1 className="font-display text-5xl tracking-wider text-white mb-2">{ui.title}</h1>
             <p className="text-white/50 font-mono text-sm">{ui.sub}</p>
@@ -717,9 +718,6 @@ export default function SignupPage() {
           </p>
         </div>
       </div>
-    </div>
-    <div className="hidden lg:block relative overflow-hidden bg-[#07090D]">
-      <AuthArtPanel />
     </div>
     </div>
   )
