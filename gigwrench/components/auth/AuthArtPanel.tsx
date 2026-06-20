@@ -18,7 +18,7 @@ export default function AuthArtPanel() {
       />
 
       {/* Live dispatch card */}
-      <div className="hidden lg:block absolute right-8 bottom-28 w-[340px] rounded-2xl border border-white/10 p-4 shadow-2xl bg-[#0B1018]/85 backdrop-blur-md">
+      <div className="hidden xl:block absolute right-[360px] bottom-10 w-[340px] rounded-2xl border border-white/10 p-4 shadow-2xl bg-[#0B1018]/85 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <img src="/auth/pro-avatar.jpg" alt="" className="w-11 h-11 rounded-xl object-cover border border-yellow-400/40" />
           <div className="leading-tight">
