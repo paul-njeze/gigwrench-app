@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     // Load job plus the owning Pro, verify ownership.
     const { data: job, error: jErr } = await serviceClient
       .from('jobs')
-      .select('id,title,customer_id,pro_id,arrived_at,pro:profiles!jobs_pro_id_fkey(id,first_name,last_name,phone)')
+      .select('id,title,customer_id,pro_id,arrived_at')
       .eq('id', job_id)
       .single()
 
@@ -75,13 +75,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: updErr.message }, { status: 500 })
     }
 
-    const pro = job.pro as unknown as {
-      id: string
-      first_name: string
-      last_name: string
-      phone: string | null
-    }
-    const proName = `${pro.first_name} ${pro.last_name}`.trim()
+    // jobs.pro_id points at pro_profiles, whose id mirrors the base profiles
+    // row, so the Pro name lives in profiles under the same id. Fetch it
+    // directly since there is no direct foreign key from jobs to profiles.
+    const { data: pro } = await serviceClient
+      .from('profiles')
+      .select('first_name,last_name,phone')
+      .eq('id', job.pro_id)
+      .single()
+    const proName = `${pro?.first_name ?? ''} ${pro?.last_name ?? ''}`.trim()
 
     const { data: customer } = await serviceClient
       .from('profiles')
