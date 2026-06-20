@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import DispatchTestPanel from '@/components/DispatchTestPanel'
 
 interface BookingRequest {
     id: string
@@ -92,6 +93,9 @@ export default function DispatchPage() {
                                   <h1 className="font-mono text-2xl uppercase tracking-widest text-white mb-2">Dispatch Inbox</h1>
                                   <p className="text-white/40 text-sm">Dispatch manages your bookings automatically. Review and act on requests below.</p>
                         </div>
+
+                {/* Pro-side Dispatch test sandbox */}
+                <DispatchTestPanel />
                   {loading && (
                       <div className="flex flex-col gap-3">
                                   <SkeletonCard/><SkeletonCard/><SkeletonCard/>
