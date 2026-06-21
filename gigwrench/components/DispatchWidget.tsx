@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { X, Send, ChevronDown, Loader2 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 const LANGS = [
   { code: 'en', label: 'English' },
@@ -114,9 +115,15 @@ export default function DispatchWidget() {
     setInput('')
     setLoading(true)
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      try {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`
+      } catch {}
       const res = await fetch('/api/support/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ messages: newMessages, lang }),
       })
       const data = await res.json()
