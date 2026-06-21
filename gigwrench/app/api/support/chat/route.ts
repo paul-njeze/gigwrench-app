@@ -60,24 +60,32 @@ ${KNOWLEDGE}
 ${GUARDRAILS}
 ${ESCALATION}`
 
+const FALLBACK =
+  "I'm having a bit of trouble right now. Please email us at support@gigwrench.app and we'll get back to you within 24 hours."
+
 export async function POST(req: NextRequest) {
+  const debug = req.headers.get('x-gw-debug') === '1'
   try {
     const { messages, lang } = await req.json()
 
     // A Supabase session cookie means the user is signed in. Presence is enough to
     // pick the coordinator persona; real per-user capabilities will validate the token.
-    const authed = req.cookies
-      .getAll()
-      .some((c) => /-auth-token(\.[0-9]+)?$/.test(c.name))
+    const authed = req.cookies.getAll().some((c) => /-auth-token(\.[0-9]+)?$/.test(c.name))
 
-    // Cap history and message size to keep this public endpoint safe and inexpensive.
+    // Normalize the conversation for the Anthropic API.
     const safeMessages = (Array.isArray(messages) ? messages : [])
       .slice(-12)
       .filter(
         (m: { role?: string; content?: string }) =>
-          m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string'
+          m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim().length > 0
       )
       .map((m: { role: string; content: string }) => ({ role: m.role, content: m.content.slice(0, 2000) }))
+
+    // The Anthropic API requires the first message to be from the user. The widget
+    // seeds an assistant greeting, so drop any leading assistant turns before sending.
+    while (safeMessages.length && safeMessages[0].role !== 'user') {
+      safeMessages.shift()
+    }
 
     if (safeMessages.length === 0) {
       return NextResponse.json({ message: 'How can I help you with GigWrench today?', escalate: false }, { status: 200 })
@@ -105,7 +113,11 @@ export async function POST(req: NextRequest) {
     })
 
     if (!response.ok) {
-      throw new Error(`Anthropic API error: ${response.status}`)
+      const errText = await response.text().catch(() => '')
+      return NextResponse.json(
+        { message: FALLBACK, escalate: false, ...(debug ? { debug: `upstream ${response.status}: ${errText.slice(0, 400)}` } : {}) },
+        { status: 200 }
+      )
     }
 
     const data = await response.json()
@@ -121,12 +133,9 @@ export async function POST(req: NextRequest) {
       escalate: shouldEscalate,
       escalationSummary,
     })
-  } catch {
+  } catch (e) {
     return NextResponse.json(
-      {
-        message: "I'm having a bit of trouble right now. Please email us at support@gigwrench.app and we'll get back to you within 24 hours.",
-        escalate: false,
-      },
+      { message: FALLBACK, escalate: false, ...(debug ? { debug: String(e).slice(0, 400) } : {}) },
       { status: 200 }
     )
   }
