@@ -15,15 +15,18 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ job
     if (!job) return NextResponse.json({ ok: false }, { status: 404 })
 
     let proName = 'Your Pro'
+    let proPhone: string | null = null
     if (job.pro_id) {
-      const { data: profRaw } = await svc.from('profiles').select('first_name').eq('id', job.pro_id).maybeSingle()
-      const prof = profRaw as unknown as { first_name: string | null } | null
+      const { data: profRaw } = await svc.from('profiles').select('first_name,phone').eq('id', job.pro_id).maybeSingle()
+      const prof = profRaw as unknown as { first_name: string | null; phone: string | null } | null
       if (prof?.first_name) proName = prof.first_name
+      if (prof?.phone) proPhone = prof.phone
     }
 
     return NextResponse.json({
       ok: true,
       proName,
+      proPhone,
       status: job.status,
       title: job.title,
       destination: job.lat != null && job.lng != null ? { lat: job.lat, lng: job.lng } : null,
