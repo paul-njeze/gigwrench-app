@@ -7,79 +7,74 @@ import { createClient } from '@supabase/supabase-js'
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-interface ProLocation {
-  id: string
-  lat: number
-  lng: number
-  updated_at: string
-}
-
 declare global {
   interface Window {
     L: any
   }
 }
 
+type LatLng = [number, number]
+
+function bearing(a: LatLng, b: LatLng): number {
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const toDeg = (r: number) => (r * 180) / Math.PI
+  const y = Math.sin(toRad(b[1] - a[1])) * Math.cos(toRad(b[0]))
+  const x =
+    Math.cos(toRad(a[0])) * Math.sin(toRad(b[0])) -
+    Math.sin(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.cos(toRad(b[1] - a[1]))
+  return (toDeg(Math.atan2(y, x)) + 360) % 360
+}
+
+function haversineMeters(a: LatLng, b: LatLng): number {
+  const R = 6371000
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const dLat = toRad(b[0] - a[0])
+  const dLng = toRad(b[1] - a[1])
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(s))
+}
+
+const VAN_HTML =
+  '<div class="gw-van-rot" style="width:46px;height:46px;display:flex;align-items:center;justify-content:center;transition:transform 0.6s linear;">' +
+  '<div style="width:38px;height:38px;border-radius:50%;background:#F5C518;box-shadow:0 4px 14px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;">' +
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="#0B0F17"><path d="M3 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1h2.4a2 2 0 0 1 1.7 1l1.6 2.7a2 2 0 0 1 .3 1V16a1 1 0 0 1-1 1h-1.1a2.5 2.5 0 0 1-4.8 0H9.9a2.5 2.5 0 0 1-4.8 0H4a1 1 0 0 1-1-1V7zm12 3h4.6l-1.3-2.2a.5.5 0 0 0-.4-.3H15v2.5zM6.5 16.5a1 1 0 1 0 2 0 1 1 0 0 0-2 0zm9 0a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"/></svg>' +
+  '</div></div>'
+
 export default function TrackPage() {
   const { jobId } = useParams<{ jobId: string }>()
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
-  const markerRef = useRef<any>(null)
+  const vanRef = useRef<any>(null)
+  const destRef = useRef<any>(null)
+  const routeRef = useRef<any>(null)
+  const curRef = useRef<LatLng | null>(null)
+  const rafRef = useRef<number | null>(null)
+  const followRef = useRef<boolean>(true)
+  const destRef2 = useRef<LatLng | null>(null)
+  const lastRouteAt = useRef<number>(0)
+
   const [waiting, setWaiting] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<string | null>(null)
+  const [proName, setProName] = useState<string>('Your Pro')
+  const [eta, setEta] = useState<string | null>(null)
+  const [dist, setDist] = useState<string | null>(null)
+  const [following, setFollowing] = useState(true)
 
   useEffect(() => {
     if (!jobId) return
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON)
     let leafletLoaded = false
 
-    function initMap(lat: number, lng: number) {
-      if (!mapRef.current || mapInstanceRef.current) return
-      if (typeof window === 'undefined' || !window.L) return
-
-      const L = window.L
-
-      L.Icon.Default.mergeOptions({
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      })
-
-      const map = L.map(mapRef.current).setView([lat, lng], 15)
-      mapInstanceRef.current = map
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(map)
-
-      const marker = L.marker([lat, lng]).addTo(map)
-      marker.bindPopup('Your Pro is here').openPopup()
-      markerRef.current = marker
-    }
-
-    function updateMarker(lat: number, lng: number) {
-      if (markerRef.current) {
-        markerRef.current.setLatLng([lat, lng])
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.panTo([lat, lng])
-        }
-      } else {
-        initMap(lat, lng)
-      }
-      setLastUpdate(new Date().toLocaleTimeString())
-    }
-
-    async function loadLeaflet(): Promise<void> {
+    function loadLeaflet(): Promise<void> {
       return new Promise((resolve) => {
-        if (window.L) { resolve(); return }
-
+        if (window.L) return resolve()
         const link = document.createElement('link')
         link.rel = 'stylesheet'
         link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
         document.head.appendChild(link)
-
         const script = document.createElement('script')
         script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
         script.onload = () => resolve()
@@ -87,74 +82,151 @@ export default function TrackPage() {
       })
     }
 
+    function rotateVan(deg: number) {
+      const el = vanRef.current?.getElement()?.querySelector('.gw-van-rot') as HTMLElement | null
+      if (el) el.style.transform = `rotate(${deg}deg)`
+    }
+
+    function initMap(lat: number, lng: number) {
+      if (!mapRef.current || mapInstanceRef.current || !window.L) return
+      const L = window.L
+      const map = L.map(mapRef.current, { zoomControl: true }).setView([lat, lng], 16)
+      mapInstanceRef.current = map
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20,
+        attribution: '&copy; OpenStreetMap, &copy; CARTO',
+      }).addTo(map)
+      map.on('dragstart', () => {
+        followRef.current = false
+        setFollowing(false)
+      })
+      const van = L.marker([lat, lng], {
+        icon: L.divIcon({ html: VAN_HTML, className: 'gw-van-icon', iconSize: [46, 46], iconAnchor: [23, 23] }),
+        zIndexOffset: 1000,
+      }).addTo(map)
+      vanRef.current = van
+      curRef.current = [lat, lng]
+      if (destRef2.current) drawDest(destRef2.current)
+    }
+
+    function drawDest(d: LatLng) {
+      const L = window.L
+      if (!mapInstanceRef.current || !L) return
+      if (!destRef.current) {
+        destRef.current = L.marker(d, {
+          icon: L.divIcon({
+            html: '<div style="width:18px;height:18px;border-radius:50% 50% 50% 0;background:#F5C518;transform:rotate(-45deg);border:2px solid #0B0F17;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>',
+            className: 'gw-dest-icon',
+            iconSize: [18, 18],
+            iconAnchor: [9, 18],
+          }),
+        }).addTo(mapInstanceRef.current)
+      }
+    }
+
+    async function refreshRoute(from: LatLng) {
+      const d = destRef2.current
+      if (!d) return
+      const now = Date.now()
+      if (now - lastRouteAt.current < 12000) return
+      lastRouteAt.current = now
+      try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${d[1]},${d[0]}?overview=full&geometries=geojson`
+        const res = await fetch(url)
+        const json = await res.json()
+        const route = json?.routes?.[0]
+        const L = window.L
+        if (route && mapInstanceRef.current && L) {
+          const coords: LatLng[] = route.geometry.coordinates.map((c: number[]) => [c[1], c[0]])
+          if (routeRef.current) mapInstanceRef.current.removeLayer(routeRef.current)
+          routeRef.current = L.polyline(coords, { color: '#F5C518', weight: 5, opacity: 0.85 }).addTo(mapInstanceRef.current)
+          const mins = Math.max(1, Math.round(route.duration / 60))
+          const miles = route.distance / 1609.34
+          setEta(`${mins} min`)
+          setDist(`${miles.toFixed(1)} mi away`)
+        }
+      } catch {
+        const L = window.L
+        if (mapInstanceRef.current && L && d) {
+          if (routeRef.current) mapInstanceRef.current.removeLayer(routeRef.current)
+          routeRef.current = L.polyline([from, d], { color: '#F5C518', weight: 4, opacity: 0.6, dashArray: '6 8' }).addTo(mapInstanceRef.current)
+          const miles = haversineMeters(from, d) / 1609.34
+          setDist(`${miles.toFixed(1)} mi away`)
+        }
+      }
+    }
+
+    function animateTo(target: LatLng) {
+      if (!vanRef.current) return
+      const start = curRef.current || target
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      if (haversineMeters(start, target) > 1) rotateVan(bearing(start, target))
+      const t0 = performance.now()
+      const dur = 1400
+      const step = (now: number) => {
+        const k = Math.min(1, (now - t0) / dur)
+        const lat = start[0] + (target[0] - start[0]) * k
+        const lng = start[1] + (target[1] - start[1]) * k
+        vanRef.current.setLatLng([lat, lng])
+        if (followRef.current && mapInstanceRef.current) mapInstanceRef.current.panTo([lat, lng], { animate: false })
+        if (k < 1) rafRef.current = requestAnimationFrame(step)
+        else curRef.current = target
+      }
+      rafRef.current = requestAnimationFrame(step)
+    }
+
+    async function onFix(lat: number, lng: number) {
+      setWaiting(false)
+      if (!leafletLoaded) {
+        await loadLeaflet()
+        leafletLoaded = true
+      }
+      if (!mapInstanceRef.current) initMap(lat, lng)
+      else animateTo([lat, lng])
+      setLastUpdate(new Date().toLocaleTimeString())
+      refreshRoute([lat, lng])
+    }
+
     async function init() {
       try {
-        const { data, error: fetchError } = await supabase
+        // Curated destination and Pro name (safe public fields).
+        try {
+          const meta = await fetch(`/api/track/${jobId}`).then((r) => r.json())
+          if (meta?.ok) {
+            if (meta.proName) setProName(meta.proName)
+            if (meta.destination) destRef2.current = [meta.destination.lat, meta.destination.lng]
+          }
+        } catch {}
+
+        const { data } = await supabase
           .from('pro_locations')
           .select('id, lat, lng, updated_at')
           .eq('job_id', jobId)
           .maybeSingle()
 
-        if (fetchError) {
-          setError('Could not load location data.')
-          return
-        }
-
         if (data) {
-          setWaiting(false)
-          await loadLeaflet()
-          leafletLoaded = true
-          initMap(data.lat, data.lng)
+          await onFix(data.lat, data.lng)
           setLastUpdate(new Date(data.updated_at).toLocaleTimeString())
         }
 
         const channel = supabase
           .channel('pro-location-' + jobId)
-          .on(
-            'postgres_changes' as any,
-            {
-              event: 'UPDATE',
-              schema: 'public',
-              table: 'pro_locations',
-              filter: `job_id=eq.${jobId}`,
-            },
-            async (payload: any) => {
-              setWaiting(false)
-              if (!leafletLoaded) {
-                await loadLeaflet()
-                leafletLoaded = true
-              }
-              updateMarker(payload.new.lat, payload.new.lng)
-            }
-          )
-          .on(
-            'postgres_changes' as any,
-            {
-              event: 'INSERT',
-              schema: 'public',
-              table: 'pro_locations',
-              filter: `job_id=eq.${jobId}`,
-            },
-            async (payload: any) => {
-              setWaiting(false)
-              if (!leafletLoaded) {
-                await loadLeaflet()
-                leafletLoaded = true
-              }
-              updateMarker(payload.new.lat, payload.new.lng)
-            }
-          )
+          .on('postgres_changes' as any, { event: 'UPDATE', schema: 'public', table: 'pro_locations', filter: `job_id=eq.${jobId}` },
+            (p: any) => onFix(p.new.lat, p.new.lng))
+          .on('postgres_changes' as any, { event: 'INSERT', schema: 'public', table: 'pro_locations', filter: `job_id=eq.${jobId}` },
+            (p: any) => onFix(p.new.lat, p.new.lng))
           .subscribe()
 
         return () => {
           supabase.removeChannel(channel)
+          if (rafRef.current) cancelAnimationFrame(rafRef.current)
           if (mapInstanceRef.current) {
             mapInstanceRef.current.remove()
             mapInstanceRef.current = null
-            markerRef.current = null
+            vanRef.current = null
           }
         }
-      } catch (err) {
+      } catch {
         setError('An unexpected error occurred.')
       }
     }
@@ -165,13 +237,22 @@ export default function TrackPage() {
     }
   }, [jobId])
 
+  function recenter() {
+    followRef.current = true
+    setFollowing(true)
+    const map = mapInstanceRef.current
+    const L = window.L
+    if (!map || !L) return
+    if (curRef.current && destRef2.current) {
+      map.fitBounds(L.latLngBounds([curRef.current, destRef2.current]).pad(0.25))
+    } else if (curRef.current) {
+      map.setView(curRef.current, 16)
+    }
+  }
+
   return (
     <div className="flex flex-col h-screen bg-[#07090D]" style={{ fontFamily: 'DM Sans, sans-serif' }}>
-      {/* Header */}
-      <header
-        className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-[#0B0F17] flex-shrink-0"
-        style={{ height: '56px' }}
-      >
+      <header className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-[#0B0F17] flex-shrink-0" style={{ height: '56px' }}>
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5C518" strokeWidth="2.5">
@@ -182,26 +263,22 @@ export default function TrackPage() {
             GIG<span style={{ color: '#F5C518' }}>WRENCH</span>
           </span>
         </div>
-
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
           </span>
           <span className="text-xs text-white/50" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-            Live tracking -- your Pro is on the way
+            {proName} is on the way
           </span>
         </div>
       </header>
 
-      {/* Map area */}
       <div className="flex-1 relative" style={{ minHeight: 0 }}>
         {waiting && !error && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10 bg-[#07090D]">
             <div className="w-12 h-12 rounded-full border-2 border-yellow-400/20 border-t-yellow-400 animate-spin" />
-            <p className="text-white/40 text-sm" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-              Waiting for Pro to share location...
-            </p>
+            <p className="text-white/40 text-sm" style={{ fontFamily: 'JetBrains Mono, monospace' }}>Waiting for {proName} to share location...</p>
           </div>
         )}
 
@@ -211,31 +288,31 @@ export default function TrackPage() {
           </div>
         )}
 
-        <div
-          ref={mapRef}
-          style={{ position: 'absolute', inset: 0, zIndex: 1 }}
-        />
+        <div ref={mapRef} style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
+
+        {(eta || dist) && !waiting && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-[#0B0F17]/92 border border-white/10 rounded-full px-4 py-2 flex items-center gap-3 shadow-xl">
+            {eta && <span className="text-yellow-400 text-sm font-bold" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{eta}</span>}
+            {dist && <span className="text-white/55 text-xs" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{dist}</span>}
+          </div>
+        )}
+
+        {!following && !waiting && (
+          <button onClick={recenter} className="absolute bottom-20 right-4 z-20 bg-[#0B0F17]/92 border border-white/10 rounded-full w-11 h-11 flex items-center justify-center shadow-xl active:scale-95 transition">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F5C518" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></svg>
+          </button>
+        )}
 
         {lastUpdate && (
-          <div
-            className="absolute bottom-4 right-4 z-20 bg-[#0B0F17]/90 border border-white/8 rounded-lg px-3 py-1.5"
-          >
-            <span className="text-[10px] text-white/40" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-              Updated {lastUpdate}
-            </span>
+          <div className="absolute bottom-4 left-4 z-20 bg-[#0B0F17]/90 border border-white/8 rounded-lg px-3 py-1.5">
+            <span className="text-[10px] text-white/40" style={{ fontFamily: 'JetBrains Mono, monospace' }}>Updated {lastUpdate}</span>
           </div>
         )}
       </div>
 
-      {/* Footer */}
-      <footer
-        className="flex items-center justify-center px-4 border-t border-white/6 bg-[#0B0F17] flex-shrink-0"
-        style={{ height: '40px' }}
-      >
-        <span className="text-[11px] text-white/20" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-          Powered by GigWrench
-        </span>
+      <footer className="flex items-center justify-center px-4 border-t border-white/6 bg-[#0B0F17] flex-shrink-0" style={{ height: '40px' }}>
+        <span className="text-[11px] text-white/20" style={{ fontFamily: 'JetBrains Mono, monospace' }}>Powered by GigWrench</span>
       </footer>
     </div>
   )
-            }
+}
