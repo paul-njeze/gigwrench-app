@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
       prefKeys: { email: 'email_on_the_way', sms: 'sms_on_the_way' },
       prefs,
       email: {
-        from: 'dispatch@gigwrench.app',
+        from: 'GigWrench Dispatch <dispatch@gigwrench.app>',
         subject: `${proName} has arrived`,
         html: buildArrivedEmail(customerName, proName, job.title),
       },
