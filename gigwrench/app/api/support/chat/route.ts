@@ -74,9 +74,10 @@ const money = (n: number, cur: string) => `${cur} ${n.toFixed(2)}`
 
 type JobRow = { status: string; title: string | null; scheduled_at: string | null; customer_id: string | null; pro_id?: string | null; tracking_active?: boolean | null }
 type InvRow = { status: string; amount: number | null; paid_at: string | null; due_at: string | null; currency?: string | null }
+type ProRow = { plan: string | null; avg_rating: number | null; total_reviews: number | null; total_jobs: number | null; on_time_rate: number | null; business_name: string | null }
 
 async function buildProSnapshot(svc: ReturnType<typeof createClient>, userId: string, firstName: string): Promise<string> {
-  const [{ data: pp }, { data: jobsRaw }, { data: invRaw }] = await Promise.all([
+  const [{ data: ppRaw }, { data: jobsRaw }, { data: invRaw }] = await Promise.all([
     svc.from('pro_profiles').select('plan,avg_rating,total_reviews,total_jobs,on_time_rate,business_name').eq('id', userId).maybeSingle(),
     svc.from('jobs').select('status,title,scheduled_at,customer_id').eq('pro_id', userId).order('scheduled_at', { ascending: false }).limit(200),
     svc.from('invoices').select('status,amount,paid_at,due_at,currency').eq('pro_id', userId).limit(500),
@@ -85,6 +86,7 @@ async function buildProSnapshot(svc: ReturnType<typeof createClient>, userId: st
   const invs = (invRaw || []) as InvRow[]
   const cur = invs.find((i) => i.currency)?.currency || 'USD'
 
+  const pp = ppRaw as unknown as ProRow | null
   const byStatus: Record<string, number> = {}
   const customers = new Set<string>()
   for (const j of jobs) {
@@ -180,7 +182,8 @@ export async function POST(req: NextRequest) {
         const { data: { user } } = await anon.auth.getUser()
         if (user) {
           const svc = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-          const { data: prof } = await svc.from('profiles').select('role,first_name').eq('id', user.id).maybeSingle()
+          const { data: profRaw } = await svc.from('profiles').select('role,first_name').eq('id', user.id).maybeSingle()
+          const prof = profRaw as unknown as { role: 'pro' | 'customer'; first_name: string | null } | null
           if (prof?.role === 'pro' || prof?.role === 'customer') {
             role = prof.role
             firstName = prof.first_name || ''
