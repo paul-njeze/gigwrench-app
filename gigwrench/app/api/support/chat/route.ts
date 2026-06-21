@@ -76,7 +76,7 @@ type JobRow = { status: string; title: string | null; scheduled_at: string | nul
 type InvRow = { status: string; amount: number | null; paid_at: string | null; due_at: string | null; currency?: string | null }
 type ProRow = { plan: string | null; avg_rating: number | null; total_reviews: number | null; total_jobs: number | null; on_time_rate: number | null; business_name: string | null }
 
-async function buildProSnapshot(svc: ReturnType<typeof createClient>, userId: string, firstName: string): Promise<string> {
+async function buildProSnapshot(svc: any, userId: string, firstName: string): Promise<string> {
   const [{ data: ppRaw }, { data: jobsRaw }, { data: invRaw }] = await Promise.all([
     svc.from('pro_profiles').select('plan,avg_rating,total_reviews,total_jobs,on_time_rate,business_name').eq('id', userId).maybeSingle(),
     svc.from('jobs').select('status,title,scheduled_at,customer_id').eq('pro_id', userId).order('scheduled_at', { ascending: false }).limit(200),
@@ -120,7 +120,7 @@ async function buildProSnapshot(svc: ReturnType<typeof createClient>, userId: st
   ].join('\n')
 }
 
-async function buildCustomerSnapshot(svc: ReturnType<typeof createClient>, userId: string, firstName: string): Promise<string> {
+async function buildCustomerSnapshot(svc: any, userId: string, firstName: string): Promise<string> {
   const [{ data: jobsRaw }, { data: invRaw }] = await Promise.all([
     svc.from('jobs').select('status,title,scheduled_at,tracking_active,pro_id').eq('customer_id', userId).order('scheduled_at', { ascending: false }).limit(100),
     svc.from('invoices').select('status,amount,due_at,currency').eq('customer_id', userId).limit(200),
