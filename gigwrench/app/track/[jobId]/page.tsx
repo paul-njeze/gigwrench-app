@@ -71,6 +71,7 @@ export default function TrackPage() {
   const [dist, setDist] = useState<string | null>(null)
   const [following, setFollowing] = useState(true)
   const [proPhone, setProPhone] = useState<string | null>(null)
+  const [draft, setDraft] = useState('')
 
   useEffect(() => {
     if (!jobId) return
@@ -324,21 +325,26 @@ export default function TrackPage() {
         <div className="flex-shrink-0 bg-[#0B0F17] border-t border-white/8 px-3 pt-3 pb-2 flex flex-col gap-2">
           <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
             {PRESETS.map((p) => (
-              <a key={p} href={`sms:${(proPhone || '').replace(/\s/g, '')}?body=${encodeURIComponent(p)}`}
+              <button key={p} type="button" onClick={() => setDraft(p)}
                 className="flex-shrink-0 text-xs text-white/80 bg-white/8 border border-white/10 rounded-full px-3 py-1.5 active:scale-95 transition"
-                style={{ fontFamily: 'DM Sans, sans-serif' }}>{p}</a>
+                style={{ fontFamily: 'DM Sans, sans-serif' }}>{p}</button>
             ))}
           </div>
-          <div className="flex gap-2">
-            <a href={`tel:${(proPhone || '').replace(/\s/g, '')}`}
-              className="flex-1 flex items-center justify-center gap-2 bg-green-500 text-black font-semibold rounded-xl py-3 active:scale-95 transition" style={{ fontFamily: 'DM Sans, sans-serif' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1z"/></svg>
-              Call {proName}
+          <div className="flex items-center gap-2">
+            <input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 min-w-0 bg-white/8 border border-white/12 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/35 outline-none focus:border-yellow-400/40"
+              style={{ fontFamily: 'DM Sans, sans-serif' }}
+            />
+            <a href={`sms:${(proPhone || '').replace(/\s/g, '')}?body=${encodeURIComponent(draft)}`}
+              className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-yellow-400 text-black rounded-xl active:scale-95 transition" aria-label="Send text">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11l18-8-8 18-2-7-8-3z"/></svg>
             </a>
-            <a href={`sms:${(proPhone || '').replace(/\s/g, '')}`}
-              className="flex-1 flex items-center justify-center gap-2 bg-white/10 border border-white/15 text-white font-semibold rounded-xl py-3 active:scale-95 transition" style={{ fontFamily: 'DM Sans, sans-serif' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.4 8.4 0 0 1-4-1L3 20l1-5.5a8.4 8.4 0 0 1-1-4A8.4 8.4 0 0 1 11.5 2 8.4 8.4 0 0 1 21 11.5z"/></svg>
-              Text
+            <a href={`tel:${(proPhone || '').replace(/\s/g, '')}`}
+              className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-green-500 text-black rounded-xl active:scale-95 transition" aria-label="Call">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1z"/></svg>
             </a>
           </div>
         </div>
