@@ -37,17 +37,32 @@ function haversineMeters(a: LatLng, b: LatLng): number {
 }
 
 const VAN_HTML =
-  '<div class="gw-van-rot" style="width:46px;height:46px;display:flex;align-items:center;justify-content:center;transition:transform 0.6s linear;">' +
-  '<div style="width:38px;height:38px;border-radius:50%;background:#F5C518;box-shadow:0 4px 14px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;">' +
-  '<svg width="22" height="22" viewBox="0 0 24 24" fill="#0B0F17"><path d="M3 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1h2.4a2 2 0 0 1 1.7 1l1.6 2.7a2 2 0 0 1 .3 1V16a1 1 0 0 1-1 1h-1.1a2.5 2.5 0 0 1-4.8 0H9.9a2.5 2.5 0 0 1-4.8 0H4a1 1 0 0 1-1-1V7zm12 3h4.6l-1.3-2.2a.5.5 0 0 0-.4-.3H15v2.5zM6.5 16.5a1 1 0 1 0 2 0 1 1 0 0 0-2 0zm9 0a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"/></svg>' +
-  '</div></div>'
+  '<div class="gw-van-rot" style="width:34px;height:42px;display:flex;align-items:center;justify-content:center;transition:transform 0.5s linear;filter:drop-shadow(0 3px 5px rgba(0,0,0,0.55));">' +
+  '<svg width="30" height="40" viewBox="0 0 32 42">' +
+  '<rect x="6" y="3" width="20" height="34" rx="5" fill="#F7F7F5" stroke="#0B0F17" stroke-width="1.2"/>' +
+  '<rect x="8.5" y="5" width="15" height="6" rx="2" fill="#36A2FF"/>' +
+  '<rect x="9" y="13.5" width="14" height="11" rx="1.5" fill="#E6E6E2"/>' +
+  '<rect x="8.5" y="29" width="15" height="5" rx="2" fill="#243349"/>' +
+  '<rect x="3.5" y="9" width="3" height="2.4" rx="1" fill="#F7F7F5"/>' +
+  '<rect x="25.5" y="9" width="3" height="2.4" rx="1" fill="#F7F7F5"/>' +
+  '</svg></div>'
 
-const PRESETS = [
+const PRESETS_PRIMARY = [
   "I'm home",
   'Please call when you arrive',
   'Running a few minutes late',
   'Use the side door',
-  'Gate code is ',
+]
+
+const PRESETS_MORE = [
+  'Please park in the driveway',
+  'I will be about 10 minutes late',
+  'Please knock, the doorbell is broken',
+  'The unit is in the backyard',
+  'My dog is friendly',
+  'Text me when you are outside',
+  'How much longer until you arrive?',
+  'The gate code is ',
 ]
 
 export default function TrackPage() {
@@ -72,6 +87,7 @@ export default function TrackPage() {
   const [following, setFollowing] = useState(true)
   const [proPhone, setProPhone] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
+  const [showMore, setShowMore] = useState(false)
 
   useEffect(() => {
     if (!jobId) return
@@ -111,7 +127,7 @@ export default function TrackPage() {
         setFollowing(false)
       })
       const van = L.marker([lat, lng], {
-        icon: L.divIcon({ html: VAN_HTML, className: 'gw-van-icon', iconSize: [46, 46], iconAnchor: [23, 23] }),
+        icon: L.divIcon({ html: VAN_HTML, className: 'gw-van-icon', iconSize: [34, 42], iconAnchor: [17, 21] }),
         zIndexOffset: 1000,
       }).addTo(map)
       vanRef.current = van
@@ -261,6 +277,8 @@ export default function TrackPage() {
     }
   }
 
+  const telNum = (proPhone || '').replace(/\s/g, '')
+
   return (
     <div className="flex flex-col h-screen bg-[#07090D]" style={{ fontFamily: 'DM Sans, sans-serif' }}>
       <header className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-[#0B0F17] flex-shrink-0" style={{ height: '56px' }}>
@@ -324,12 +342,24 @@ export default function TrackPage() {
       {proPhone && !waiting && (
         <div className="flex-shrink-0 bg-[#0B0F17] border-t border-white/8 px-3 pt-3 pb-2 flex flex-col gap-2">
           <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-            {PRESETS.map((p) => (
-              <button key={p} type="button" onClick={() => setDraft(p)}
+            {PRESETS_PRIMARY.map((p) => (
+              <a key={p} href={`sms:${telNum}?body=${encodeURIComponent(p)}`}
                 className="flex-shrink-0 text-xs text-white/80 bg-white/8 border border-white/10 rounded-full px-3 py-1.5 active:scale-95 transition"
-                style={{ fontFamily: 'DM Sans, sans-serif' }}>{p}</button>
+                style={{ fontFamily: 'DM Sans, sans-serif' }}>{p}</a>
             ))}
+            <button type="button" onClick={() => setShowMore((v) => !v)}
+              className="flex-shrink-0 text-xs font-semibold text-yellow-400 bg-yellow-400/10 border border-yellow-400/25 rounded-full px-3 py-1.5 active:scale-95 transition"
+              style={{ fontFamily: 'DM Sans, sans-serif' }}>{showMore ? 'Less' : 'More'}</button>
           </div>
+          {showMore && (
+            <div className="flex flex-wrap gap-2 pb-1">
+              {PRESETS_MORE.map((p) => (
+                <a key={p} href={`sms:${telNum}?body=${encodeURIComponent(p)}`}
+                  className="text-xs text-white/80 bg-white/8 border border-white/10 rounded-full px-3 py-1.5 active:scale-95 transition"
+                  style={{ fontFamily: 'DM Sans, sans-serif' }}>{p}</a>
+              ))}
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <input
               value={draft}
@@ -338,11 +368,11 @@ export default function TrackPage() {
               className="flex-1 min-w-0 bg-white/8 border border-white/12 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/35 outline-none focus:border-yellow-400/40"
               style={{ fontFamily: 'DM Sans, sans-serif' }}
             />
-            <a href={`sms:${(proPhone || '').replace(/\s/g, '')}?body=${encodeURIComponent(draft)}`}
+            <a href={`sms:${telNum}?body=${encodeURIComponent(draft)}`}
               className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-yellow-400 text-black rounded-xl active:scale-95 transition" aria-label="Send text">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11l18-8-8 18-2-7-8-3z"/></svg>
             </a>
-            <a href={`tel:${(proPhone || '').replace(/\s/g, '')}`}
+            <a href={`tel:${telNum}`}
               className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-green-500 text-black rounded-xl active:scale-95 transition" aria-label="Call">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1z"/></svg>
             </a>
