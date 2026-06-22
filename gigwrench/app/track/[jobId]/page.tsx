@@ -47,14 +47,14 @@ const VAN_HTML =
   '<rect x="25.5" y="9" width="3" height="2.4" rx="1" fill="#F7F7F5"/>' +
   '</svg></div>'
 
-const PRESETS_PRIMARY = [
+const CUSTOMER_PRIMARY = [
   "I'm home",
   'Please call when you arrive',
   'Running a few minutes late',
   'Use the side door',
 ]
 
-const PRESETS_MORE = [
+const CUSTOMER_MORE = [
   'Please park in the driveway',
   'I will be about 10 minutes late',
   'Please knock, the doorbell is broken',
@@ -63,6 +63,24 @@ const PRESETS_MORE = [
   'Text me when you are outside',
   'How much longer until you arrive?',
   'The gate code is ',
+]
+
+const PRO_PRIMARY = [
+  "I'm on my way",
+  'Running about 10 minutes late',
+  "I've arrived, I'm outside",
+  'Can you confirm the address?',
+]
+
+const PRO_MORE = [
+  'I am parking now',
+  'Please secure any pets',
+  'I am at the gate',
+  'Sending your invoice now',
+  'Job complete, thank you!',
+  'Can you give me a call?',
+  'Be there in 5 minutes',
+  'I need access to the work area',
 ]
 
 export default function TrackPage() {
@@ -85,7 +103,10 @@ export default function TrackPage() {
   const [eta, setEta] = useState<string | null>(null)
   const [dist, setDist] = useState<string | null>(null)
   const [following, setFollowing] = useState(true)
-  const [proPhone, setProPhone] = useState<string | null>(null)
+  const [contactPhone, setContactPhone] = useState<string | null>(null)
+  const [role, setRole] = useState<'pro' | 'customer'>('customer')
+  const [contactName, setContactName] = useState<string>('Your Pro')
+  const [customerName, setCustomerName] = useState<string>('your customer')
   const [draft, setDraft] = useState('')
   const [showMore, setShowMore] = useState(false)
 
@@ -217,10 +238,16 @@ export default function TrackPage() {
       try {
         // Curated destination and Pro name (safe public fields).
         try {
-          const meta = await fetch(`/api/track/${jobId}`).then((r) => r.json())
+          const { data: { session } } = await supabase.auth.getSession()
+          const headers: Record<string, string> = {}
+          if (session?.access_token) headers['Authorization'] = 'Bearer ' + session.access_token
+          const meta = await fetch(`/api/track/${jobId}`, { headers }).then((r) => r.json())
           if (meta?.ok) {
             if (meta.proName) setProName(meta.proName)
-            if (meta.proPhone) setProPhone(meta.proPhone)
+            if (meta.role) setRole(meta.role)
+            if (meta.contactName) setContactName(meta.contactName)
+            if (meta.customerName) setCustomerName(meta.customerName)
+            if (meta.contactPhone) setContactPhone(meta.contactPhone)
             if (meta.destination) destRef2.current = [meta.destination.lat, meta.destination.lng]
           }
         } catch {}
@@ -277,7 +304,7 @@ export default function TrackPage() {
     }
   }
 
-  const telNum = (proPhone || '').replace(/\s/g, '')
+  const telNum = (contactPhone || '').replace(/\s/g, '')
 
   return (
     <div className="flex flex-col h-screen bg-[#07090D]" style={{ fontFamily: 'DM Sans, sans-serif' }}>
@@ -298,7 +325,7 @@ export default function TrackPage() {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
           </span>
           <span className="text-xs text-white/50" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-            {proName} is on the way
+            {role === 'pro' ? 'Heading to ' + customerName : proName + ' is on the way'}
           </span>
         </div>
       </header>
@@ -307,7 +334,7 @@ export default function TrackPage() {
         {waiting && !error && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10 bg-[#07090D]">
             <div className="w-12 h-12 rounded-full border-2 border-yellow-400/20 border-t-yellow-400 animate-spin" />
-            <p className="text-white/40 text-sm" style={{ fontFamily: 'JetBrains Mono, monospace' }}>Waiting for {proName} to share location...</p>
+            <p className="text-white/40 text-sm" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{role === 'pro' ? 'Waiting for your location...' : 'Waiting for ' + proName + ' to share location...'}</p>
           </div>
         )}
 
@@ -339,10 +366,10 @@ export default function TrackPage() {
         )}
       </div>
 
-      {proPhone && !waiting && (
+      {contactPhone && !waiting && (
         <div className="flex-shrink-0 bg-[#0B0F17] border-t border-white/8 px-3 pt-3 pb-2 flex flex-col gap-2">
           <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-            {PRESETS_PRIMARY.map((p) => (
+            {(role === 'pro' ? PRO_PRIMARY : CUSTOMER_PRIMARY).map((p) => (
               <a key={p} href={`sms:${telNum}?body=${encodeURIComponent(p)}`}
                 className="flex-shrink-0 text-xs text-white/80 bg-white/8 border border-white/10 rounded-full px-3 py-1.5 active:scale-95 transition"
                 style={{ fontFamily: 'DM Sans, sans-serif' }}>{p}</a>
@@ -353,7 +380,7 @@ export default function TrackPage() {
           </div>
           {showMore && (
             <div className="flex flex-wrap gap-2 pb-1">
-              {PRESETS_MORE.map((p) => (
+              {(role === 'pro' ? PRO_MORE : CUSTOMER_MORE).map((p) => (
                 <a key={p} href={`sms:${telNum}?body=${encodeURIComponent(p)}`}
                   className="text-xs text-white/80 bg-white/8 border border-white/10 rounded-full px-3 py-1.5 active:scale-95 transition"
                   style={{ fontFamily: 'DM Sans, sans-serif' }}>{p}</a>
@@ -369,11 +396,11 @@ export default function TrackPage() {
               style={{ fontFamily: 'DM Sans, sans-serif' }}
             />
             <a href={`sms:${telNum}?body=${encodeURIComponent(draft)}`}
-              className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-yellow-400 text-black rounded-xl active:scale-95 transition" aria-label="Send text">
+              className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-yellow-400 text-black rounded-xl active:scale-95 transition" aria-label={`Text ${contactName}`}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11l18-8-8 18-2-7-8-3z"/></svg>
             </a>
             <a href={`tel:${telNum}`}
-              className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-green-500 text-black rounded-xl active:scale-95 transition" aria-label="Call">
+              className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-green-500 text-black rounded-xl active:scale-95 transition" aria-label={`Call ${contactName}`}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1z"/></svg>
             </a>
           </div>
