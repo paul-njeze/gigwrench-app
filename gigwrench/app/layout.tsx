@@ -3,7 +3,7 @@ import './globals.css'
 import DispatchWidget from '@/components/DispatchWidget'
 
 export const metadata: Metadata = {
-  title: 'GigWrench — Run Your Trade Like a Pro',
+  title: 'GigWrench: Run Your Trade Like a Pro',
   description: 'AI-powered business platform for solo Pros.',
 }
 
