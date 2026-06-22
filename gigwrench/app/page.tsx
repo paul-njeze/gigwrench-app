@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Zap, MapPin, Camera, MessageSquare, FileText, Users,
@@ -1148,26 +1148,7 @@ const FAQ_CUSTOMERS: Record<string, Faq[]> = {
 
 // ─── LANGUAGE PICKER MODAL ───────────────────────────────────────────────────
 function LanguagePicker({ onSelect }: { onSelect: (code: string) => void }) {
-  const [seconds, setSeconds] = useState(6)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      setSeconds(s => {
-        if (s <= 1) {
-          onSelect('en')
-          return 0
-        }
-        return s - 1
-      })
-    }, 1000)
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [onSelect])
-
   const c = COPY.en
-  const radius = 22
-  const circ = 2 * Math.PI * radius
-  const offset = circ * (1 - seconds / 6)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: 'rgba(7,9,13,0.85)', backdropFilter: 'blur(12px)' }}>
@@ -1195,20 +1176,9 @@ function LanguagePicker({ onSelect }: { onSelect: (code: string) => void }) {
           ))}
         </div>
 
-        {/* Countdown skip button */}
         <div className="flex justify-center">
-          <button onClick={() => onSelect('en')} className="flex items-center gap-3 group">
-            <div className="relative w-12 h-12 flex-shrink-0">
-              <svg className="w-12 h-12 -rotate-90" viewBox="0 0 56 56">
-                <circle cx="28" cy="28" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3"/>
-                <circle cx="28" cy="28" r={radius} fill="none" stroke="#F5C518" strokeWidth="3"
-                  strokeDasharray={circ} strokeDashoffset={offset}
-                  style={{ transition: 'stroke-dashoffset 1s linear' }}
-                  strokeLinecap="round"/>
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center font-mono text-sm font-bold text-yellow-400">{seconds}</span>
-            </div>
-            <span className="font-mono text-sm text-white/40 group-hover:text-white/70 transition-colors">{c.skip}</span>
+          <button onClick={() => onSelect('en')} className="font-mono text-sm text-white/40 hover:text-white/70 transition-colors">
+            {c.skip}
           </button>
         </div>
       </div>
