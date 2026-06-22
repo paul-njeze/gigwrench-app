@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { X, Send, ChevronDown, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { usePathname } from 'next/navigation'
 
 const LANGS = [
   { code: 'en', label: 'English' },
@@ -42,6 +43,7 @@ type Message = { role: 'user' | 'assistant'; content: string }
 type Stage = 'lang' | 'chat' | 'escalate'
 
 export default function DispatchWidget() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [stage, setStage] = useState<Stage>('lang')
   const [lang, setLang] = useState('en')
@@ -163,6 +165,8 @@ export default function DispatchWidget() {
     setEscalateName('')
     setEscalateEmail('')
   }
+
+  if (pathname?.startsWith('/track')) return null
 
   return (
     <>
