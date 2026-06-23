@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -48,6 +49,35 @@ export async function GET(request: NextRequest) {
           await supabase.from('pro_profiles').insert({ id: data.user.id })
         } else {
           await supabase.from('customer_profiles').insert({ id: data.user.id })
+
+          // Accept any pending job invites addressed to this email, stamping the
+          // new customer onto those jobs so in-app chat and the live tracker
+          // resolve immediately. This runs through the service role because the
+          // jobs belong to the inviting Pro, not this customer, so an RLS-scoped
+          // session client could not update them. Best effort: a failure here
+          // never blocks account creation.
+          try {
+            const inviteEmail = (data.user.email || '').toLowerCase()
+            if (inviteEmail && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+              const svc = createServiceClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.SUPABASE_SERVICE_ROLE_KEY!,
+              )
+              const nowIso = new Date().toISOString()
+              const { data: invites } = await svc
+                .from('job_customer_invites')
+                .select('id, job_id')
+                .eq('status', 'pending')
+                .ilike('customer_email', inviteEmail)
+                .gt('expires_at', nowIso)
+              for (const inv of (invites || []) as { id: string; job_id: string }[]) {
+                await svc.from('jobs').update({ customer_id: data.user.id }).eq('id', inv.job_id).is('customer_id', null)
+                await svc.from('job_customer_invites').update({ status: 'accepted', accepted_by: data.user.id, accepted_at: nowIso }).eq('id', inv.id)
+              }
+            }
+          } catch {
+            // Invite acceptance is best effort and never blocks signup.
+          }
         }
       }
 
