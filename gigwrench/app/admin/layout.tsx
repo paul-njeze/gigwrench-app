@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Shield, Users, UserPlus, BarChart3, Flag, LogOut } from 'lucide-react'
+import { Shield, Users, UserPlus, BarChart3, Flag, Inbox, LogOut } from 'lucide-react'
 
 const NAV = [
   { href: '/admin', label: 'Overview', icon: Shield },
@@ -12,6 +12,7 @@ const NAV = [
   { href: '/admin/signups', label: 'Sign ups', icon: UserPlus },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/reports', label: 'Reports', icon: Flag },
+  { href: '/admin/inbox', label: 'Inbox', icon: Inbox },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
