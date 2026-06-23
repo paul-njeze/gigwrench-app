@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/lang'
-import { UserPlus, X, Search, Loader2, Check } from 'lucide-react'
+import { UserPlus, X, Search, Loader2, Check, Mail } from 'lucide-react'
 
 type Customer = { id: string; firstName: string; lastName: string; avatarUrl: string | null }
 
@@ -36,6 +36,9 @@ export default function CustomerLinkCard({
   const [searching, setSearching] = useState(false)
   const [linkingId, setLinkingId] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteStatus, setInviteStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   async function token(): Promise<string | null> {
     const { data: { session } } = await supabase.auth.getSession()
@@ -114,6 +117,28 @@ export default function CustomerLinkCard({
     }
   }
 
+  async function sendInvite() {
+    const email = inviteEmail.trim()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return
+    setInviteStatus('sending')
+    const tok = await token()
+    if (!tok) {
+      setInviteStatus('error')
+      return
+    }
+    try {
+      const res = await fetch('/api/jobs/invite-customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },
+        body: JSON.stringify({ jobId, email }),
+      })
+      const d = await res.json()
+      setInviteStatus(d?.ok ? 'sent' : 'error')
+    } catch {
+      setInviteStatus('error')
+    }
+  }
+
   return (
     <div className="bg-[#0B0F17] border border-white/6 rounded-xl p-5">
       <p className="font-mono text-[10px] uppercase tracking-widest text-white/30 mb-3">{t('customer')}</p>
@@ -142,15 +167,72 @@ export default function CustomerLinkCard({
           </button>
         </div>
       ) : !open ? (
-        <div>
-          <p className="text-white/40 text-xs leading-relaxed mb-3">{t('cust_none_hint')}</p>
-          <button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 px-3 py-2 rounded-lg font-mono text-[11px] uppercase tracking-wider hover:bg-yellow-400/20 transition-colors"
-          >
-            <UserPlus size={13} /> {t('cust_link')}
-          </button>
-        </div>
+        !inviteOpen ? (
+          <div>
+            <p className="text-white/40 text-xs leading-relaxed mb-3">{t('cust_none_hint')}</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setOpen(true)}
+                className="flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 px-3 py-2 rounded-lg font-mono text-[11px] uppercase tracking-wider hover:bg-yellow-400/20 transition-colors"
+              >
+                <UserPlus size={13} /> {t('cust_link')}
+              </button>
+              <button
+                onClick={() => {
+                  setInviteOpen(true)
+                  setInviteStatus('idle')
+                  setError('')
+                }}
+                className="flex items-center gap-2 bg-white/4 border border-white/8 text-white/70 px-3 py-2 rounded-lg font-mono text-[11px] uppercase tracking-wider hover:bg-white/8 transition-colors"
+              >
+                <Mail size={13} /> {t('cust_invite')}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className="relative mb-2">
+              <Mail size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" />
+              <input
+                autoFocus
+                type="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder={t('cust_invite_ph')}
+                className="w-full bg-[#07090D] border border-white/8 rounded-lg pl-8 pr-8 py-2 text-sm text-white outline-none focus:border-yellow-400/30 placeholder:text-white/20"
+              />
+              <button
+                onClick={() => {
+                  setInviteOpen(false)
+                  setInviteEmail('')
+                  setInviteStatus('idle')
+                  setError('')
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            {inviteStatus === 'sent' ? (
+              <p className="px-1 py-2 text-green-400/80 text-xs flex items-center gap-1.5">
+                <Check size={12} /> {t('cust_invite_sent')}
+              </p>
+            ) : (
+              <>
+                <p className="text-white/30 text-[11px] leading-relaxed mb-2">{t('cust_invite_hint')}</p>
+                <button
+                  onClick={sendInvite}
+                  disabled={inviteStatus === 'sending' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail.trim())}
+                  className="flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 px-3 py-2 rounded-lg font-mono text-[11px] uppercase tracking-wider hover:bg-yellow-400/20 transition-colors disabled:opacity-40"
+                >
+                  {inviteStatus === 'sending' ? <Loader2 size={13} className="animate-spin" /> : <Mail size={13} />}
+                  {inviteStatus === 'sending' ? t('cust_invite_sending') : t('cust_invite_send')}
+                </button>
+              </>
+            )}
+            {inviteStatus === 'error' && <p className="px-1 py-2 text-red-300 text-xs">{t('cust_invite_failed')}</p>}
+          </div>
+        )
       ) : (
         <div>
           <div className="relative mb-2">
