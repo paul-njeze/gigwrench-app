@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/lang'
 import GpsConsentModal from '@/components/gps/GpsConsentModal'
 import ChatThread from '@/components/messages/ChatThread'
+import CustomerLinkCard from '@/components/jobs/CustomerLinkCard'
 import {
   ArrowLeft, Clock, MapPin, Navigation, CheckCircle2,
   Calendar, DollarSign, MapPinned, MessageSquare,
@@ -224,6 +225,12 @@ export default function JobDetailPage() {
               <p className="text-white/45 text-sm leading-relaxed mt-4 pt-4 border-t border-white/6 whitespace-pre-wrap">{job.description}</p>
             )}
           </div>
+
+          <CustomerLinkCard
+            jobId={job.id}
+            initialCustomerId={job.customer_id}
+            onChange={(cid) => setJob((prev) => (prev ? { ...prev, customer_id: cid } : prev))}
+          />
 
           <div className="flex flex-col gap-2">
             {showActive && (
