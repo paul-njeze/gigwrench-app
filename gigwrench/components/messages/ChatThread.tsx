@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useLang } from '@/lib/lang'
 import { Send, Languages, ChevronLeft } from 'lucide-react'
 
 type Message = {
@@ -43,6 +44,7 @@ function initials(first: string, last: string) {
 
 export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: () => void }) {
   const supabase = useMemo(() => createClient(), [])
+  const { t } = useLang()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [me, setMe] = useState<Me | null>(null)
@@ -68,7 +70,7 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
       const t = await token()
       if (!t) {
         if (!cancelled) {
-          setError('Please sign in to view this conversation.')
+          setError(t('chat_signin_required'))
           setLoading(false)
         }
         return
@@ -78,19 +80,19 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
         const data = await res.json()
         if (cancelled) return
         if (!data.ok) {
-          setError('This conversation could not be loaded.')
+          setError(t('chat_load_failed'))
           setLoading(false)
           return
         }
         setMe(data.me)
         meIdRef.current = data.me?.id || ''
         setCounterparty(data.counterparty)
-        setTitle(data.job?.title || 'Job')
+        setTitle(data.job?.title || t('chat_job_fallback'))
         setMessages(data.messages || [])
         setLoading(false)
       } catch {
         if (!cancelled) {
-          setError('This conversation could not be loaded.')
+          setError(t('chat_load_failed'))
           setLoading(false)
         }
       }
@@ -176,7 +178,7 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
     setRevealed((r) => ({ ...r, [id]: !r[id] }))
   }
 
-  const cpName = counterparty ? `${counterparty.firstName} ${counterparty.lastName}`.trim() || 'Customer' : 'Conversation'
+  const cpName = counterparty ? `${counterparty.firstName} ${counterparty.lastName}`.trim() || t('customer') : t('chat_conversation_fallback')
 
   return (
     <div className="flex flex-col h-full bg-[#0B0F17]">
@@ -219,8 +221,8 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
 
         {!loading && !error && messages.length === 0 && (
           <div className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-2">
-            <span className="text-white/50 text-sm">No messages yet.</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-white/25">Say hello to get started</span>
+            <span className="text-white/50 text-sm">{t('chat_no_messages')}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-white/25">{t('chat_say_hello')}</span>
           </div>
         )}
 
@@ -244,7 +246,7 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
                   <span className="font-mono text-[9px] text-white/25">{fmtTime(m.created_at)}</span>
                   {v.translatedTag && !v.showingAlt && (
                     <span className="font-mono text-[9px] uppercase tracking-wider text-white/25 flex items-center gap-1">
-                      <Languages size={10} /> Translated
+                      <Languages size={10} /> {t('chat_translated')}
                     </span>
                   )}
                   {v.hasAlt && (
@@ -252,7 +254,7 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
                       onClick={() => toggle(m.id)}
                       className="font-mono text-[9px] uppercase tracking-wider text-white/30 hover:text-yellow-400 transition-colors"
                     >
-                      {v.showingAlt ? (v.mine ? 'Hide translation' : 'Hide original') : v.mine ? 'Show translation' : 'Show original'}
+                      {v.showingAlt ? (v.mine ? t('chat_hide_translation') : t('chat_hide_original')) : v.mine ? t('chat_show_translation') : t('chat_show_original')}
                     </button>
                   )}
                 </div>
@@ -273,7 +275,7 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
             }
           }}
           rows={1}
-          placeholder="Type a message"
+          placeholder={t('chat_type_message')}
           className="flex-1 resize-none bg-white/4 border border-white/8 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-yellow-400/40 max-h-32"
         />
         <button
