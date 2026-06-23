@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { Users, UserPlus, BarChart3, Flag } from 'lucide-react'
+import { Users, UserPlus, BarChart3, Flag, Inbox } from 'lucide-react'
 
 const CARDS = [
   { href: '/admin/accounts', label: 'Accounts', icon: Users, desc: 'Search accounts, warn, suspend, disable, or restore.' },
   { href: '/admin/signups', label: 'Sign ups', icon: UserPlus, desc: 'Every registration, filterable, with export.' },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, desc: 'Platform metrics and business intelligence.' },
   { href: '/admin/reports', label: 'Reports', icon: Flag, desc: 'Investigate reports and issue decisions.' },
+  { href: '/admin/inbox', label: 'Inbox', icon: Inbox, desc: 'Read chat threads across all users for support and moderation.' },
 ]
 
 export default function AdminHome() {
