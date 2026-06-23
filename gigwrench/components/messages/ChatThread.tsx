@@ -67,8 +67,8 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
     async function load() {
       setLoading(true)
       setError('')
-      const t = await token()
-      if (!t) {
+      const tok = await token()
+      if (!tok) {
         if (!cancelled) {
           setError(t('chat_signin_required'))
           setLoading(false)
@@ -76,7 +76,7 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
         return
       }
       try {
-        const res = await fetch(`/api/messages/${jobId}`, { headers: { Authorization: `Bearer ${t}` } })
+        const res = await fetch(`/api/messages/${jobId}`, { headers: { Authorization: `Bearer ${tok}` } })
         const data = await res.json()
         if (cancelled) return
         if (!data.ok) {
@@ -132,15 +132,15 @@ export default function ChatThread({ jobId, onBack }: { jobId: string; onBack?: 
     const text = input.trim()
     if (!text || sending) return
     setSending(true)
-    const t = await token()
-    if (!t) {
+    const tok = await token()
+    if (!tok) {
       setSending(false)
       return
     }
     try {
       const res = await fetch(`/api/messages/${jobId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },
         body: JSON.stringify({ text }),
       })
       const data = await res.json()
