@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
+import ChatThread from '@/components/messages/ChatThread'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -109,6 +110,8 @@ export default function TrackPage() {
   const [customerName, setCustomerName] = useState<string>('your customer')
   const [draft, setDraft] = useState('')
   const [showMore, setShowMore] = useState(false)
+  const [signedIn, setSignedIn] = useState(false)
+  const [chatOpen, setChatOpen] = useState(false)
 
   useEffect(() => {
     if (!jobId) return
@@ -239,6 +242,7 @@ export default function TrackPage() {
         // Curated destination and Pro name (safe public fields).
         try {
           const { data: { session } } = await supabase.auth.getSession()
+          setSignedIn(!!session?.access_token)
           const headers: Record<string, string> = {}
           if (session?.access_token) headers['Authorization'] = 'Bearer ' + session.access_token
           const meta = await fetch(`/api/track/${jobId}`, { headers }).then((r) => r.json())
@@ -327,6 +331,11 @@ export default function TrackPage() {
           <span className="text-xs text-white/50" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
             {role === 'pro' ? 'Heading to ' + customerName : proName + ' is on the way'}
           </span>
+          {signedIn && (
+            <button onClick={() => setChatOpen(true)} aria-label="Open messages" className="ml-1 w-8 h-8 rounded-lg bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center active:scale-95 transition">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5C518" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </button>
+          )}
         </div>
       </header>
 
@@ -409,6 +418,15 @@ export default function TrackPage() {
       <footer className="flex items-center justify-center px-4 border-t border-white/6 bg-[#0B0F17] flex-shrink-0" style={{ height: '40px' }}>
         <span className="text-[11px] text-white/20" style={{ fontFamily: 'JetBrains Mono, monospace' }}>Powered by GigWrench</span>
       </footer>
+
+      {chatOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={() => setChatOpen(false)} />
+          <div className="relative h-[82vh] flex flex-col rounded-t-2xl overflow-hidden border-t border-white/10 shadow-2xl">
+            <ChatThread jobId={jobId} onBack={() => setChatOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
