@@ -13,6 +13,7 @@ import VerificationBanner from '@/components/VerificationBanner'
 import OnboardingChat from '@/components/OnboardingChat'
 import TourOverlay from '@/components/TourOverlay'
 import OnMyWayBanner from '@/components/gps/OnMyWayBanner'
+import InviteToGigWrench from '@/components/invite/InviteToGigWrench'
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { t, lang, setLang } = useLang()
@@ -94,6 +95,11 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           )
         })}
       </nav>
+
+      {/* Invite friends */}
+      <div className="px-3 pb-1">
+        <InviteToGigWrench />
+      </div>
 
       {/* Language selector */}
       <div className="px-3 pb-2">
