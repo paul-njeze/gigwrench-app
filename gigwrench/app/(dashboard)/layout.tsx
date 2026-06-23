@@ -20,6 +20,31 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   const router = useRouter()
   const [showLang, setShowLang] = useState(false)
 
+  const [unread, setUnread] = useState(0)
+  useEffect(() => {
+    const supabase = createClient()
+    let active = true
+    async function loadUnread() {
+      const { data: { session } } = await supabase.auth.getSession()
+      const tok = session?.access_token
+      if (!tok) return
+      try {
+        const res = await fetch('/api/messages', { headers: { Authorization: `Bearer ${tok}` } })
+        const data = await res.json()
+        if (active && data.ok) setUnread(data.unreadTotal || 0)
+      } catch {}
+    }
+    loadUnread()
+    const ch = supabase
+      .channel('sidebar-unread-' + Math.random().toString(36).slice(2))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => loadUnread())
+      .subscribe()
+    return () => {
+      active = false
+      supabase.removeChannel(ch)
+    }
+  }, [])
+
   const nav = [
     { href: '/dashboard', icon: LayoutDashboard, key: 'dashboard', tour: 'tour-dashboard' },
     { href: '/jobs', icon: Briefcase, key: 'jobs', tour: 'tour-jobs' },
@@ -62,8 +87,8 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
                 ${active ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-white/40 hover:text-white hover:bg-white/4'}`}>
               <Icon size={16} className={active ? 'text-yellow-400' : 'text-white/30 group-hover:text-white/60'}/>
               <span className="font-mono text-xs uppercase tracking-widest">{t(key)}</span>
-              {key === 'messages' && (
-                <span className="ml-auto bg-yellow-400 text-black text-[9px] font-bold px-1.5 py-0.5 rounded-full">3</span>
+              {key === 'messages' && unread > 0 && (
+                <span className="ml-auto bg-yellow-400 text-black text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unread > 99 ? '99+' : unread}</span>
               )}
             </Link>
           )
