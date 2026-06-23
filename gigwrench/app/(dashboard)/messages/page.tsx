@@ -65,7 +65,7 @@ export default function MessagesPage() {
   async function loadList() {
     const tok = await token()
     if (!tok) {
-      setError('Please sign in to see your messages.')
+      setError(t('msgs_signin_required'))
       setLoading(false)
       return
     }
@@ -144,9 +144,9 @@ export default function MessagesPage() {
           {!loading && !error && threads.length === 0 && (
             <div className="p-8 text-center flex flex-col items-center gap-2">
               <MessageSquare size={22} className="text-white/20" />
-              <span className="text-white/50 text-sm">No conversations yet</span>
+              <span className="text-white/50 text-sm">{t('msgs_no_conversations')}</span>
               <span className="font-mono text-[10px] uppercase tracking-widest text-white/25">
-                Threads appear once you have a job
+                {t('msgs_threads_hint')}
               </span>
             </div>
           )}
@@ -154,12 +154,12 @@ export default function MessagesPage() {
           {!loading &&
             !error &&
             threads.map((th) => {
-              const name = th.counterparty.firstName || 'Customer'
+              const name = th.counterparty.firstName || t('customer')
               const seed = th.counterparty.id || th.jobId
               const active = selected === th.jobId
               const preview = th.lastMessage
-                ? `${th.lastMessage.fromMe ? 'You: ' : ''}${th.lastMessage.text}`
-                : 'No messages yet'
+                ? `${th.lastMessage.fromMe ? t('msgs_you_prefix') : ''}${th.lastMessage.text}`
+                : t('msgs_no_messages_short')
               return (
                 <button
                   key={th.jobId}
@@ -218,9 +218,9 @@ export default function MessagesPage() {
             <div className="w-12 h-12 rounded-2xl bg-white/4 border border-white/8 flex items-center justify-center">
               <MessageSquare size={20} className="text-white/30" />
             </div>
-            <span className="text-white/50 text-sm">Select a conversation</span>
+            <span className="text-white/50 text-sm">{t('msgs_select_conversation')}</span>
             <span className="font-mono text-[10px] uppercase tracking-widest text-white/25">
-              Pick a thread on the left to start
+              {t('msgs_pick_thread')}
             </span>
           </div>
         )}
