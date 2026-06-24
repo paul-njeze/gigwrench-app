@@ -200,6 +200,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         router.push('/login?status=' + status)
         return
       }
+      // Role guard: customers belong in the slim portal, not the Pro shell.
+      if (profile?.role === 'customer') {
+        router.push('/portal')
+        return
+      }
       if (profile?.language) setUserLang(profile.language as Language)
       setUserId(user.id)
       setUserName(profile?.first_name || '')
