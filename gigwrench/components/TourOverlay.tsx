@@ -88,20 +88,20 @@ const STEPS: TourStep[] = [
       de: 'Dispatch', it: 'Dispatch', nl: 'Dispatch', ro: 'Dispatch', sv: 'Dispatch',
     },
     body: {
-      en: 'Dispatch is your AI booking agent. It answers leads by SMS while you are on a job -- 24/7, under 90 seconds.',
-      es: 'Dispatch es tu agente de reservas con IA. Responde consultas por SMS mientras trabajas -- 24/7, en menos de 90 segundos.',
-      pt: 'Dispatch e seu agente de reservas com IA. Responde leads por SMS enquanto voce trabalha -- 24/7, em menos de 90 segundos.',
-      fr: 'Dispatch est votre agent de reservation IA. Il repond aux leads par SMS pendant que vous travaillez -- 24/7, en moins de 90 secondes.',
-      ar: 'Dispatch هو وكيل الحجز بالذكاء الاصطناعي. يرد على العملاء بالرسائل اثناء عملك -- 24/7 في اقل من 90 ثانية.',
+      en: 'Dispatch is your AI booking agent. It answers leads by SMS while you are on a job, 24/7, under 90 seconds.',
+      es: 'Dispatch es tu agente de reservas con IA. Responde consultas por SMS mientras trabajas, 24/7, en menos de 90 segundos.',
+      pt: 'Dispatch e seu agente de reservas com IA. Responde leads por SMS enquanto voce trabalha, 24/7, em menos de 90 segundos.',
+      fr: 'Dispatch est votre agent de reservation IA. Il repond aux leads par SMS pendant que vous travaillez, 24/7, en moins de 90 secondes.',
+      ar: 'Dispatch هو وكيل الحجز بالذكاء الاصطناعي. يرد على العملاء بالرسائل اثناء عملك، 24/7 في اقل من 90 ثانية.',
       zh: 'Dispatch 是您的 AI 预约代理。在您工作时通过短信回复客户线索，24/7，90秒内响应。',
-      hi: 'Dispatch आपका AI बुकिंग एजेंट है। काम पर रहते हुए SMS से लीड का जवाब देता है -- 24/7, 90 सेकंड से कम।',
-      ko: 'Dispatch는 AI 예약 에이전트입니다. 작업 중에도 SMS로 리드에 응답합니다 -- 24/7, 90초 이내.',
-      tr: 'Dispatch, yapay zeka rezervasyon ajanınızdır. Çalışırken SMS ile musterilere yanit verir -- 7/24, 90 saniye icinde.',
-      de: 'Dispatch ist Ihr KI-Buchungsagent. Er beantwortet Leads per SMS wahrend Sie arbeiten -- 24/7, unter 90 Sekunden.',
-      it: 'Dispatch e il tuo agente di prenotazione AI. Risponde ai lead via SMS mentre lavori -- 24/7, in meno di 90 secondi.',
-      nl: 'Dispatch is uw AI-boekingsagent. Het beantwoordt leads via SMS terwijl u werkt -- 24/7, binnen 90 seconden.',
-      ro: 'Dispatch este agentul tau AI de rezervari. Raspunde la lead-uri prin SMS cat timp lucrezi -- 24/7, sub 90 de secunde.',
-      sv: 'Dispatch ar din AI-bokningsagent. Den svarar pa leads via SMS medan du jobbar -- 24/7, under 90 sekunder.',
+      hi: 'Dispatch आपका AI बुकिंग एजेंट है। काम पर रहते हुए SMS से लीड का जवाब देता है, 24/7, 90 सेकंड से कम।',
+      ko: 'Dispatch는 AI 예약 에이전트입니다. 작업 중에도 SMS로 리드에 응답합니다, 24/7, 90초 이내.',
+      tr: 'Dispatch, yapay zeka rezervasyon ajanınızdır. Çalışırken SMS ile musterilere yanit verir, 7/24, 90 saniye icinde.',
+      de: 'Dispatch ist Ihr KI-Buchungsagent. Er beantwortet Leads per SMS wahrend Sie arbeiten, 24/7, unter 90 Sekunden.',
+      it: 'Dispatch e il tuo agente di prenotazione AI. Risponde ai lead via SMS mentre lavori, 24/7, in meno di 90 secondi.',
+      nl: 'Dispatch is uw AI-boekingsagent. Het beantwoordt leads via SMS terwijl u werkt, 24/7, binnen 90 seconden.',
+      ro: 'Dispatch este agentul tau AI de rezervari. Raspunde la lead-uri prin SMS cat timp lucrezi, 24/7, sub 90 de secunde.',
+      sv: 'Dispatch ar din AI-bokningsagent. Den svarar pa leads via SMS medan du jobbar, 24/7, under 90 sekunder.',
     },
   },
   {
@@ -192,14 +192,14 @@ const STEPS: TourStep[] = [
       it: 'Trova un Pro', nl: 'Vind een Pro', ro: 'Gaseste un Pro', sv: 'Hitta en Pro',
     },
     body: {
-      en: 'Transfer overflow jobs to verified Pros nearby. Swipe to browse, tap to send a work order -- 24-hour acceptance window.',
+      en: 'Transfer overflow jobs to verified Pros nearby. Swipe to browse, tap to send a work order, 24-hour acceptance window.',
       es: 'Transfiere trabajos extra a Pros verificados cercanos. Desliza para explorar, toca para enviar una orden de trabajo.',
       pt: 'Transfira trabalhos extras para Pros verificados proximos. Deslize para navegar, toque para enviar uma ordem.',
       fr: 'Transferez les travaux en surplus a des Pros verifies a proximite. Faites glisser pour parcourir, appuyez pour envoyer.',
       ar: 'انقل الوظائف الزائدة الى Pros المعتمدين القريبين. اسحب للتصفح، اضغط لارسال امر عمل.',
       zh: '将溢出的工作转移给附近经过验证的Pro。滑动浏览，点击发送工作订单，24小时接受窗口。',
       hi: 'अतिरिक्त काम पास के सत्यापित Pros को ट्रांसफर करें। स्वाइप करके ब्राउज़ करें, वर्क ऑर्डर भेजने के लिए टैप करें।',
-      ko: '초과 작업을 근처 인증된 Pro에게 이전하세요. 스와이프로 탐색, 탭으로 작업 주문 전송 -- 24시간 수락 창.',
+      ko: '초과 작업을 근처 인증된 Pro에게 이전하세요. 스와이프로 탐색, 탭으로 작업 주문 전송, 24시간 수락 창.',
       tr: "Fazla isleri yakındaki dogrulanmis Pros'lara aktarin. Gozatmak icin kaydirin, is emri gondermek icin dokunun.",
       de: 'Uberschussjobs an verifizierte Pros in der Nahe ubertragen. Wischen zum Durchsuchen, tippen zum Senden.',
       it: 'Trasferisci i lavori in eccesso a Pro verificati nelle vicinanze. Scorri per sfogliare, tocca per inviare un ordine.',
@@ -448,7 +448,7 @@ export default function TourOverlay({ userId, onComplete }: Props) {
       </div>
       {/* Tooltip card */}
       <div
-        style={{ ...tooltipStyle(), width: TOOLTIP_W, zIndex: 50 }}
+        style={{ ...tooltipStyle(), width: TOOLTIP_W, zIndex: 70 }}
         className="bg-[#131C28] border border-white/10 rounded-2xl shadow-2xl p-5"
       >
         {/* Dispatch badge */}
