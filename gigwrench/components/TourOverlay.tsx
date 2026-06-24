@@ -356,7 +356,7 @@ export const CUSTOMER_STEPS: TourStep[] = [
       nl: "Elke klus die u heeft geboekt, aankomend en eerder. Open er een om de details te zien, uw Pro live te volgen en een review achter te laten als het klaar is.",
       ro: "Fiecare lucrare pe care ai rezervat-o, viitoare și anterioară. Deschide una pentru a vedea detaliile, a urmări Pro live și a lăsa o recenzie la final.",
       sv: "Varje jobb du har bokat, kommande och tidigare. Öppna ett för att se detaljerna, följa din Pro live och lämna ett omdöme när det är klart.",
-      tr: "Rezerve ettiğiniz her iş, yaklaşan ve geçmiş. Ayrıntıları görmek, Pro'nuzu canlı takip etmek ve tamamlandığında değerlendirme bırakmak için birini açın.",
+      tr: "Rezervasyon yaptığınız tüm işleriniz burada yer alır; yaklaşan ve tamamlanan işler dahil. Ayrıntıları görmek, Pro'nuzu size gelirken canlı takip etmek ve iş tamamlandığında değerlendirme bırakmak için bir işi açın.",
     },
   },
   {

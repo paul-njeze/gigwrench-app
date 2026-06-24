@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Wrench, CheckCircle } from 'lucide-react'
+import { useLang } from '@/lib/lang'
 import type { LensResult } from './LensCapture'
 
 interface Props {
@@ -17,6 +18,7 @@ function parseLowPrice(priceRange: string): number {
 
 export default function LensResultCard({ result, onAddToInvoice }: Props) {
   const [added, setAdded] = useState(false)
+  const { t } = useLang()
 
   function handleAdd() {
     const unit_price = parseLowPrice(result.price_range)
@@ -75,7 +77,7 @@ export default function LensResultCard({ result, onAddToInvoice }: Props) {
             Added!
           </>
         ) : (
-          'Add to Invoice'
+          t('lens_add_to_invoice')
         )}
       </button>
     </div>
