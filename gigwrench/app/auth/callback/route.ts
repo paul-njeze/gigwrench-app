@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const role = searchParams.get('role') || 'customer'
-  const next = searchParams.get('next') ?? '/dashboard'
+  const nextParam = searchParams.get('next')
 
   if (code) {
     const supabase = await createClient()
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       // Check if this is a new user (no profile yet)
       const { data: existingProfile } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, role')
         .eq('id', data.user.id)
         .single()
 
@@ -80,6 +80,10 @@ export async function GET(request: NextRequest) {
           }
         }
       }
+
+      const existingRole = (existingProfile as { role?: string | null } | null)?.role
+      const effectiveRole = existingRole || data.user.user_metadata?.role || role
+      const next = nextParam ?? (effectiveRole === 'customer' ? '/portal' : '/dashboard')
 
       // NIST AC-2: Redirect to appropriate page
       const forwardedHost = request.headers.get('x-forwarded-host')
