@@ -7,11 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LangProvider, useLang, LANGUAGES, type Language } from '@/lib/lang'
 import { Home, Briefcase, FileText, LogOut, ChevronDown, Menu, X, Wrench } from 'lucide-react'
-import TourOverlay, { type TourStep } from '@/components/TourOverlay'
-
-// Customer tour steps. Empty placeholder for now; commit 6 replaces this local
-// with: import TourOverlay, { CUSTOMER_STEPS } from '@/components/TourOverlay'
-const CUSTOMER_STEPS: TourStep[] = []
+import TourOverlay, { CUSTOMER_STEPS } from '@/components/TourOverlay'
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { t, lang, setLang } = useLang()
