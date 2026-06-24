@@ -210,7 +210,7 @@ const STEPS: TourStep[] = [
   },
   {
     target: 'tour-lens',
-    position: 'top',
+    position: 'right',
     title: {
       en: 'GigWrench Lens',
       es: 'GigWrench Lens', pt: 'GigWrench Lens', fr: 'GigWrench Lens', ar: 'GigWrench Lens',
