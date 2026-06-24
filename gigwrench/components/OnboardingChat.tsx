@@ -29,20 +29,20 @@ interface Props {
 
 const DISPATCH_LINES: Record<string, Record<string, string>> = {
   welcome: {
-    en: `Hey {name}! I'm Dispatch, your AI assistant. I'll get your GigWrench account set up in about 2 minutes. First -- what type of work do you do?`,
-    es: `Hola {name}! Soy Dispatch, tu asistente de IA. Voy a configurar tu cuenta en unos 2 minutos. Primero -- que tipo de trabajo haces?`,
-    pt: `Oi {name}! Sou o Dispatch, seu assistente de IA. Vou configurar sua conta em cerca de 2 minutos. Primeiro -- que tipo de trabalho voce faz?`,
-    fr: `Salut {name}! Je suis Dispatch, votre assistant IA. Je vais configurer votre compte en environ 2 minutes. D'abord -- quel type de travail faites-vous?`,
-    ar: `مرحبا {name}! انا Dispatch، مساعدك الذكي. سأقوم بإعداد حسابك في حوالي دقيقتين. اولا -- ما نوع العمل الذي تقوم به؟`,
+    en: `Hey {name}! I'm Dispatch, your AI assistant. I'll get your GigWrench account set up in about 2 minutes. First, what type of work do you do?`,
+    es: `Hola {name}! Soy Dispatch, tu asistente de IA. Voy a configurar tu cuenta en unos 2 minutos. Primero, que tipo de trabajo haces?`,
+    pt: `Oi {name}! Sou o Dispatch, seu assistente de IA. Vou configurar sua conta em cerca de 2 minutos. Primeiro, que tipo de trabalho voce faz?`,
+    fr: `Salut {name}! Je suis Dispatch, votre assistant IA. Je vais configurer votre compte en environ 2 minutes. D'abord, quel type de travail faites-vous?`,
+    ar: `مرحبا {name}! انا Dispatch، مساعدك الذكي. سأقوم بإعداد حسابك في حوالي دقيقتين. اولا، ما نوع العمل الذي تقوم به؟`,
     zh: `嗨 {name}！我是 Dispatch，您的 AI 助手。我将在大约 2 分钟内设置好您的账户。首先，您从事什么类型的工作？`,
-    hi: `नमस्ते {name}! मैं Dispatch हूं, आपका AI सहायक। मैं आपका खाता लगभग 2 मिनट में सेट कर दूंगा। पहले -- आप किस प्रकार का काम करते हैं?`,
+    hi: `नमस्ते {name}! मैं Dispatch हूं, आपका AI सहायक। मैं आपका खाता लगभग 2 मिनट में सेट कर दूंगा। पहले, आप किस प्रकार का काम करते हैं?`,
     ko: `안녕하세요 {name}! 저는 Dispatch, AI 어시스턴트입니다. 약 2분 안에 계정을 설정해 드리겠습니다. 먼저 어떤 종류의 일을 하시나요?`,
-    tr: `Merhaba {name}! Ben Dispatch, yapay zeka asistanınızım. Hesabınızı yaklaşık 2 dakikada kuracağım. Önce -- ne tür işler yapıyorsunuz?`,
-    de: `Hallo {name}! Ich bin Dispatch, Ihr KI-Assistent. Ich richte Ihr Konto in etwa 2 Minuten ein. Zuerst -- welche Art von Arbeit machen Sie?`,
-    it: `Ciao {name}! Sono Dispatch, il tuo assistente AI. Configurerò il tuo account in circa 2 minuti. Prima -- che tipo di lavoro fai?`,
-    nl: `Hallo {name}! Ik ben Dispatch, uw AI-assistent. Ik stel uw account in ongeveer 2 minuten in. Eerst -- wat voor soort werk doet u?`,
-    ro: `Buna {name}! Sunt Dispatch, asistentul tau AI. Voi configura contul tau in aproximativ 2 minute. Mai intai -- ce tip de munca faci?`,
-    sv: `Hej {name}! Jag ar Dispatch, din AI-assistent. Jag konfigurerar ditt konto pa ungefar 2 minuter. Forst -- vilken typ av arbete gor du?`,
+    tr: `Merhaba {name}! Ben Dispatch, yapay zeka asistanınızım. Hesabınızı yaklaşık 2 dakikada kuracağım. Önce, ne tür işler yapıyorsunuz?`,
+    de: `Hallo {name}! Ich bin Dispatch, Ihr KI-Assistent. Ich richte Ihr Konto in etwa 2 Minuten ein. Zuerst, welche Art von Arbeit machen Sie?`,
+    it: `Ciao {name}! Sono Dispatch, il tuo assistente AI. Configurerò il tuo account in circa 2 minuti. Prima, che tipo di lavoro fai?`,
+    nl: `Hallo {name}! Ik ben Dispatch, uw AI-assistent. Ik stel uw account in ongeveer 2 minuten in. Eerst, wat voor soort werk doet u?`,
+    ro: `Buna {name}! Sunt Dispatch, asistentul tau AI. Voi configura contul tau in aproximativ 2 minute. Mai intai, ce tip de munca faci?`,
+    sv: `Hej {name}! Jag ar Dispatch, din AI-assistent. Jag konfigurerar ditt konto pa ungefar 2 minuter. Forst, vilken typ av arbete gor du?`,
   },
   trade_ack: {
     en: `Got it. Now, what should customers call your business? And what city or area do you serve?`,
@@ -118,7 +118,7 @@ function getLine(key: string, lang: string, name?: string): string {
 
 export default function OnboardingChat({ userName, userId, onComplete }: Props) {
   const { lang } = useLang()
-  const [stage, setStage] = useState<Stage>('welcome')
+  const [stage, setStage] = useState<Stage>('trade')
   const [messages, setMessages] = useState<Message[]>([])
   const [selectedTrade, setSelectedTrade] = useState('')
   const [businessName, setBusinessName] = useState('')
@@ -157,7 +157,7 @@ export default function OnboardingChat({ userName, userId, onComplete }: Props) 
 
   function handleBusinessNext() {
     if (!businessName.trim()) return
-    pushUser(`${businessName.trim()}${serviceArea.trim() ? ' -- ' + serviceArea.trim() : ''}`)
+    pushUser(`${businessName.trim()}${serviceArea.trim() ? ', ' + serviceArea.trim() : ''}`)
     setTimeout(() => { pushDispatch('business_ack'); setStage('availability') }, 400)
   }
 
