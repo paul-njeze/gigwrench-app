@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { LangProvider, useLang, LANGUAGES, type Language } from '@/lib/lang'
 import {
   LayoutDashboard, Briefcase, FileText, Users, MessageSquare,
-  CalendarCheck, Settings, LogOut, ChevronDown, Menu, X, Wrench, Search, BarChart2
+  CalendarCheck, Settings, LogOut, ChevronDown, Menu, X, Wrench, Search, BarChart2, ScanSearch
 } from 'lucide-react'
 import VerificationBanner from '@/components/VerificationBanner'
 import OnboardingChat from '@/components/OnboardingChat'
@@ -53,6 +53,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
     { href: '/invoices', icon: FileText, key: 'invoices', tour: 'tour-invoices' },
     { href: '/customers', icon: Users, key: 'customers', tour: 'tour-customers' },
     { href: '/analytics', icon: BarChart2, key: 'analytics', tour: 'tour-analytics' },
+    { href: '/lens', icon: ScanSearch, key: 'lens', tour: 'tour-lens' },
     { href: '/messages', icon: MessageSquare, key: 'messages', tour: '' },
     { href: '/find-a-pro', icon: Search, key: 'find_a_pro', tour: 'tour-find-pro' },
     { href: '/settings', icon: Settings, key: 'settings', tour: '' },
