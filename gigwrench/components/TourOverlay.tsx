@@ -8,14 +8,14 @@ import { useLang } from '@/lib/lang'
 
 import { X, ChevronRight, ChevronLeft, Zap } from 'lucide-react'
 
-interface TourStep {
+export interface TourStep {
   target: string
   title: Record<string, string>
   body: Record<string, string>
   position: 'bottom' | 'right' | 'left' | 'top'
 }
 
-const STEPS: TourStep[] = [
+export const PRO_STEPS: TourStep[] = [
   {
     target: 'tour-dashboard',
     position: 'right',
@@ -311,15 +311,16 @@ const STEPS: TourStep[] = [
 interface Props {
   userId: string
   onComplete: () => void
+  steps?: TourStep[]
 }
 
-export default function TourOverlay({ userId, onComplete }: Props) {
+export default function TourOverlay({ userId, onComplete, steps = PRO_STEPS }: Props) {
   const { lang } = useLang()
   const [step, setStep] = useState(0)
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null)
   const [saving, setSaving] = useState(false)
 
-  const current = STEPS[step]
+  const current = steps[step]
 
   const measureTarget = useCallback(() => {
     const el = document.querySelector(`[data-tour="${current.target}"]`)
@@ -352,7 +353,7 @@ export default function TourOverlay({ userId, onComplete }: Props) {
   }
 
   function next() {
-    if (step < STEPS.length - 1) setStep(s => s + 1)
+    if (step < steps.length - 1) setStep(s => s + 1)
     else finish()
   }
 
@@ -457,13 +458,13 @@ export default function TourOverlay({ userId, onComplete }: Props) {
             <Zap size={9} className="text-yellow-400"/>
           </div>
           <span className="font-mono text-[9px] uppercase tracking-widest text-yellow-400/60">Dispatch</span>
-          <span className="ml-auto font-mono text-[9px] text-white/20">{step + 1} / {STEPS.length}</span>
+          <span className="ml-auto font-mono text-[9px] text-white/20">{step + 1} / {steps.length}</span>
         </div>
         <div className="text-white font-semibold text-sm mb-1.5">{title}</div>
         <div className="text-white/50 text-xs leading-relaxed font-mono mb-4">{body}</div>
         {/* Progress dots */}
         <div className="flex gap-1 mb-4">
-          {STEPS.map((_, i) => (
+          {steps.map((_, i) => (
             <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= step ? 'bg-yellow-400' : 'bg-white/10'}`}/>
           ))}
         </div>
@@ -477,7 +478,7 @@ export default function TourOverlay({ userId, onComplete }: Props) {
           )}
           <button onClick={next} disabled={saving}
             className="flex-1 flex items-center justify-center gap-1.5 bg-yellow-400 text-black font-semibold text-xs py-2 rounded-lg hover:bg-yellow-300 transition-colors disabled:opacity-40">
-            {step === STEPS.length - 1
+            {step === steps.length - 1
               ? (saving ? 'Saving...' : 'Done')
               : (<>Next <ChevronRight size={12}/></>)
             }
