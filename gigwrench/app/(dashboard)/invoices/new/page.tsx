@@ -57,6 +57,25 @@ export default function NewInvoicePage() {
     load()
   }, [])
 
+  // Prefill a line item when the user tapped Add to Invoice on the Lens page,
+  // which stashes the item in sessionStorage and routes here. Read once on
+  // mount, then clear the stash so a refresh does not re-add it.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('gw_lens_pending_item')
+      if (!raw) return
+      sessionStorage.removeItem('gw_lens_pending_item')
+      const item = JSON.parse(raw) as { description?: string; unit_price?: number }
+      if (!item || typeof item.description !== 'string') return
+      setLineItems([{
+        id: crypto.randomUUID(),
+        description: item.description,
+        quantity: 1,
+        unit_price: typeof item.unit_price === 'number' ? item.unit_price : 0,
+      }])
+    } catch {}
+  }, [])
+
   function addLine() {
     setLineItems(prev => [...prev, { id: crypto.randomUUID(), description: '', quantity: 1, unit_price: 0 }])
   }
