@@ -179,6 +179,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userLang, setUserLang] = useState<Language>('en')
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showTour, setShowTour] = useState(false)
+  const [userRole, setUserRole] = useState('')
   const [userId, setUserId] = useState('')
   const [userName, setUserName] = useState('')
 
@@ -202,6 +203,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (profile?.language) setUserLang(profile.language as Language)
       setUserId(user.id)
       setUserName(profile?.first_name || '')
+      setUserRole(profile?.role || '')
       // Show onboarding for Pros who have not completed it yet
       if (profile?.role === 'pro' && !profile?.onboarding_completed) {
         setShowOnboarding(true)
@@ -212,6 +214,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
     checkAuth()
   }, [router])
+
+  useEffect(() => {
+    function onStartTour() {
+      if (userRole === 'pro') setShowTour(true)
+    }
+    window.addEventListener('gw-start-tour', onStartTour)
+    return () => window.removeEventListener('gw-start-tour', onStartTour)
+  }, [userRole])
 
   if (loading) return (
     <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
