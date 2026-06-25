@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { MapPin, Copy, Check } from 'lucide-react'
+import { useLang, LANGUAGES, type Language } from '@/lib/lang'
 
 type Stage = 1 | 2 | 3 | 4 | 5 | 6
 
@@ -31,6 +32,7 @@ interface ProProfile {
 export default function BookPage() {
   const params = useParams()
   const proId = params?.proId as string
+  const { t, lang, setLang } = useLang()
 
   const [stage, setStage] = useState<Stage>(1)
   const [proProfile, setProProfile] = useState<ProProfile | null>(null)
@@ -204,7 +206,7 @@ export default function BookPage() {
           storage_path: path,
         }).select('id').single()
         if (att) {
-          setAttachments((prev) => [...prev, { id: att.id, type: 'voice', name: 'Voice note' }])
+          setAttachments((prev) => [...prev, { id: att.id, type: 'voice', name: t('bk_voice_note') }])
         }
       }
       recorder.start()
@@ -217,7 +219,7 @@ export default function BookPage() {
         }
       }, 120000)
     } catch {
-      setVoiceError('Voice notes not supported on this browser. Please upload a photo instead.')
+      setVoiceError(t('bk_voice_unsupported'))
     }
   }
 
@@ -240,11 +242,11 @@ export default function BookPage() {
         }),
       })
       const data = await res.json() as { response?: string }
-      const summary = data.response ?? 'Unable to generate summary. Please describe the job below.'
+      const summary = data.response ?? t('bk_summary_fail')
       setWorkOrderSummary(summary)
       setEditableSummary(summary)
     } catch {
-      setEditableSummary('Please describe the job scope below.')
+      setEditableSummary(t('bk_summary_fail2'))
     } finally {
       setGeneratingSummary(false)
     }
@@ -342,12 +344,24 @@ export default function BookPage() {
       {/* Header */}
       <header className="w-full max-w-xl px-4 py-4 flex items-center justify-between border-b border-[var(--color-gw-bdr)]">
         <div>
-          <span className="font-mono text-[var(--color-gw-accent)] font-bold text-lg">GigWrench</span>
-          <span className="ml-2 text-[var(--color-gw-muted)] text-sm">Dispatch</span>
+          <div>
+            <span className="font-mono text-[var(--color-gw-accent)] font-bold text-lg">GigWrench</span>
+            <span className="ml-2 text-[var(--color-gw-muted)] text-sm">Dispatch</span>
+          </div>
+          <div className="text-sm text-[var(--color-gw-muted)] mt-1">
+            {proProfile ? `${t('bk_book_with')} ${proProfile.full_name}` : t('loading')}
+          </div>
         </div>
-        <div className="text-sm text-[var(--color-gw-muted)]">
-          {proProfile ? `Book with ${proProfile.full_name}` : 'Loading...'}
-        </div>
+        <select
+          aria-label={t('bk_language')}
+          value={lang}
+          onChange={(e) => setLang(e.target.value as Language)}
+          className="bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] rounded-lg text-xs px-2 py-2 outline-none focus:border-[var(--color-gw-accent)]"
+        >
+          {Object.entries(LANGUAGES).map(([code, meta]) => (
+            <option key={code} value={code}>{`${meta.flag} ${meta.label}`}</option>
+          ))}
+        </select>
       </header>
 
       {/* Progress dots */}
@@ -370,7 +384,7 @@ export default function BookPage() {
             <div className="mb-4 p-4 rounded-xl bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)]">
               <div className="flex items-start gap-3 mb-3">
                 <div className="w-8 h-8 rounded-full bg-[var(--color-gw-accent)] text-black flex items-center justify-center text-xs font-bold flex-shrink-0">D</div>
-                <p className="text-sm leading-relaxed">Hey there! I'm Dispatch, your GigWrench booking coordinator. Let's get you sorted quickly. Tell me a bit about yourself and describe what's going on.</p>
+                <p className="text-sm leading-relaxed">{t('bk_greeting')}</p>
               </div>
             </div>
 
@@ -378,20 +392,20 @@ export default function BookPage() {
               <div className="space-y-3 mb-4">
                 <input
                   className="w-full min-h-[48px] px-4 py-3 rounded-lg bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm outline-none focus:border-[var(--color-gw-accent)]"
-                  placeholder="Your name"
+                  placeholder={t('bk_ph_name')}
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                 />
                 <input
                   className="w-full min-h-[48px] px-4 py-3 rounded-lg bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm outline-none focus:border-[var(--color-gw-accent)]"
-                  placeholder="Email address"
+                  placeholder={t('bk_ph_email')}
                   type="email"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
                 />
                 <input
                   className="w-full min-h-[48px] px-4 py-3 rounded-lg bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm outline-none focus:border-[var(--color-gw-accent)]"
-                  placeholder="Phone (optional)"
+                  placeholder={t('bk_ph_phone')}
                   type="tel"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
@@ -427,7 +441,7 @@ export default function BookPage() {
               {dispatchThinking && (
                 <div className="flex gap-2">
                   <div className="w-7 h-7 rounded-full bg-[var(--color-gw-accent)] text-black flex items-center justify-center text-xs font-bold">D</div>
-                  <div className="px-4 py-2 rounded-2xl bg-[var(--color-gw-sur)] text-sm text-[var(--color-gw-muted)]">Dispatch is thinking...</div>
+                  <div className="px-4 py-2 rounded-2xl bg-[var(--color-gw-sur)] text-sm text-[var(--color-gw-muted)]">{t('dispatchIsThinking')}</div>
                 </div>
               )}
               <div ref={conversationEndRef} />
@@ -436,7 +450,7 @@ export default function BookPage() {
             <div className="flex gap-2">
               <textarea
                 className="flex-1 min-h-[48px] px-4 py-3 rounded-lg bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm outline-none focus:border-[var(--color-gw-accent)] resize-none"
-                placeholder="Describe your problem..."
+                placeholder={`${t('describeYourProblem')}...`}
                 value={customerMessage}
                 onChange={(e) => setCustomerMessage(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage() } }}
@@ -447,7 +461,7 @@ export default function BookPage() {
                 disabled={!customerMessage.trim() || (!stage1Done && (!customerName || !customerEmail))}
                 className="min-h-[48px] px-4 rounded-lg bg-[var(--color-gw-accent)] text-black font-bold text-sm disabled:opacity-40"
               >
-                Send
+                {t('bk_send')}
               </button>
             </div>
 
@@ -457,7 +471,7 @@ export default function BookPage() {
                 className="w-full mt-4 min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm"
                 disabled={!smsConsent || !customerName || !customerMessage}
               >
-                Continue to Evidence {'->'}
+                {t('bk_continue_evidence')} {'->'}
               </button>
             )}
           </div>
@@ -466,8 +480,8 @@ export default function BookPage() {
         {/* STAGE 2: VISUAL EVIDENCE */}
         {stage === 2 && (
           <div>
-            <h2 className="text-lg font-bold mb-2">Add visual evidence</h2>
-            <p className="text-[var(--color-gw-muted)] text-sm mb-6">Help Dispatch understand the problem. At least one photo is required.</p>
+            <h2 className="text-lg font-bold mb-2">{t('bk_evidence_title')}</h2>
+            <p className="text-[var(--color-gw-muted)] text-sm mb-6">{t('bk_evidence_sub')}</p>
 
             <div className="space-y-3 mb-6">
               <button
@@ -475,7 +489,7 @@ export default function BookPage() {
                 className="w-full min-h-[64px] flex items-center gap-4 px-6 rounded-xl bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm font-medium"
               >
                 <span className="text-xl">📷</span>
-                Take Photos with Lens
+                {t('bk_take_photos')}
               </button>
               <input
                 ref={fileInputRef}
@@ -502,7 +516,7 @@ export default function BookPage() {
                 className="w-full min-h-[64px] flex items-center gap-4 px-6 rounded-xl bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm font-medium"
               >
                 <span className="text-xl">📤</span>
-                Upload Photos
+                {t('bk_upload_photos')}
               </button>
 
               <button
@@ -510,7 +524,7 @@ export default function BookPage() {
                 className={`w-full min-h-[64px] flex items-center gap-4 px-6 rounded-xl border text-sm font-medium ${isRecording ? 'bg-red-900 border-red-500' : 'bg-[var(--color-gw-sur)] border-[var(--color-gw-bdr)]'}`}
               >
                 <span className="text-xl">🎙️</span>
-                {isRecording ? 'Recording... tap to stop' : 'Record a Voice Note (max 2 min)'}
+                {isRecording ? t('bk_recording') : t('bk_record_voice')}
               </button>
             </div>
 
@@ -532,7 +546,7 @@ export default function BookPage() {
               disabled={attachments.length === 0}
               className="w-full min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm disabled:opacity-40"
             >
-              Continue to Scope {'->'}
+                {t('bk_continue_scope')} {'->'}
             </button>
           </div>
         )}
@@ -540,17 +554,17 @@ export default function BookPage() {
         {/* STAGE 3: SCOPE CONFIRMATION */}
         {stage === 3 && (
           <div>
-            <h2 className="text-lg font-bold mb-2">Confirm job scope</h2>
-            <p className="text-[var(--color-gw-muted)] text-sm mb-4">Dispatch has reviewed your conversation and photos. Edit if needed.</p>
+            <h2 className="text-lg font-bold mb-2">{t('confirmScope')}</h2>
+            <p className="text-[var(--color-gw-muted)] text-sm mb-4">{t('bk_scope_sub')}</p>
 
             {generatingSummary ? (
-              <div className="py-8 text-center text-[var(--color-gw-muted)] text-sm">Dispatch is analysing...</div>
+              <div className="py-8 text-center text-[var(--color-gw-muted)] text-sm">{t('bk_analysing')}</div>
             ) : (
               <textarea
                 value={editableSummary}
                 onChange={(e) => setEditableSummary(e.target.value)}
                 className="w-full min-h-[160px] px-4 py-3 rounded-xl bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] text-sm outline-none focus:border-[var(--color-gw-accent)] resize-none mb-4"
-                placeholder="Job scope summary..."
+                placeholder={t('bk_scope_ph')}
               />
             )}
 
@@ -559,7 +573,7 @@ export default function BookPage() {
               disabled={generatingSummary || !editableSummary.trim()}
               className="w-full min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm disabled:opacity-40"
             >
-              Looks right {'->'}
+                {t('bk_looks_right')} {'->'}
             </button>
           </div>
         )}
@@ -567,11 +581,11 @@ export default function BookPage() {
         {/* STAGE 4: SLOT SELECTION */}
         {stage === 4 && (
           <div>
-            <h2 className="text-lg font-bold mb-2">Choose a time</h2>
-            <p className="text-[var(--color-gw-muted)] text-sm mb-4">Select from the Pro's next available slots.</p>
+            <h2 className="text-lg font-bold mb-2">{t('chooseATime')}</h2>
+            <p className="text-[var(--color-gw-muted)] text-sm mb-4">{t('bk_time_sub')}</p>
 
             {loadingSlots ? (
-              <div className="py-8 text-center text-[var(--color-gw-muted)] text-sm">Finding available times...</div>
+              <div className="py-8 text-center text-[var(--color-gw-muted)] text-sm">{t('bk_finding_times')}</div>
             ) : (
               <div className="space-y-3 mb-4">
                 {slots.map((slot) => (
@@ -590,7 +604,7 @@ export default function BookPage() {
               onClick={loadSlots}
               className="w-full min-h-[48px] rounded-xl border border-[var(--color-gw-bdr)] text-sm text-[var(--color-gw-muted)] mb-3"
             >
-              Earlier or later?
+              {t('bk_earlier_later')}
             </button>
 
             <button
@@ -598,7 +612,7 @@ export default function BookPage() {
               disabled={!selectedSlot}
               className="w-full min-h-[48px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm disabled:opacity-40"
             >
-              Continue {'->'}
+                {t('bk_continue')} {'->'}
             </button>
           </div>
         )}
@@ -606,10 +620,10 @@ export default function BookPage() {
         {/* STAGE 5: TERMS AND DEPOSIT */}
         {stage === 5 && (
           <div>
-            <h2 className="text-lg font-bold mb-4">Before you confirm</h2>
+            <h2 className="text-lg font-bold mb-4">{t('bk_terms_title')}</h2>
 
             <div className="bg-[var(--color-gw-sur)] border border-[var(--color-gw-bdr)] rounded-xl p-5 mb-4 text-sm leading-relaxed space-y-2 text-[var(--color-gw-muted)]">
-              <p>By booking this appointment you agree to the following:</p>
+              <p>{t('bk_terms_intro')}</p>
               <ul className="space-y-2 list-disc list-inside">
                 <li>A $50 Priority Hold is required to confirm your booking. This amount is applied toward your final invoice.</li>
                 <li>If you cancel 12 or more hours before your appointment, you receive a 50% refund ($25). The Pro retains $20 and GigWrench retains $5.</li>
@@ -628,7 +642,7 @@ export default function BookPage() {
                 onChange={(e) => setTermsAccepted(e.target.checked)}
                 className="mt-1 w-5 h-5 accent-[var(--color-gw-accent)]"
               />
-              <span className="text-sm">I have read and agree to the terms above.</span>
+              <span className="text-sm">{t('bk_terms_agree')}</span>
             </label>
 
             <button
@@ -636,7 +650,7 @@ export default function BookPage() {
               disabled={!termsAccepted || confirming}
               className="w-full min-h-[56px] rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm disabled:opacity-40"
             >
-              {confirming ? 'Dispatch is securing your booking...' : 'Confirm and Pay $50'}
+              {confirming ? t('bk_securing') : t('confirmAndPay')}
             </button>
           </div>
         )}
@@ -645,22 +659,22 @@ export default function BookPage() {
         {stage === 6 && (
           <div className="flex flex-col items-center py-12 text-center">
             <div className="w-16 h-16 rounded-full bg-[var(--color-gw-green)] flex items-center justify-center text-white text-3xl mb-6">✓</div>
-            <h2 className="text-2xl font-bold mb-2">Your booking is confirmed</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('bk_confirmed_title')}</h2>
             <p className="text-[var(--color-gw-muted)] text-sm mb-1">
-              with {proProfile?.full_name ?? 'your Pro'}
+              {t('bk_with')} {proProfile?.full_name ?? t('bk_your_pro')}
             </p>
             {selectedSlot && (
               <p className="text-[var(--color-gw-muted)] text-sm mb-6">{selectedSlot.label}</p>
             )}
-            <p className="text-sm mb-2">A confirmation SMS and email are on their way.</p>
-            <p className="text-sm text-[var(--color-gw-muted)] mb-8">Your $50 Priority Hold payment link has been sent to your phone.</p>
+            <p className="text-sm mb-2">{t('bk_confirm_sms')}</p>
+            <p className="text-sm text-[var(--color-gw-muted)] mb-8">{t('bk_confirm_hold')}</p>
             {jobId && (
               <a
                 href={`/track/${jobId}`}
                 className="w-full min-h-[56px] flex items-center justify-center rounded-xl bg-[var(--color-gw-accent)] text-black font-bold text-sm"
               >
                 <MapPin className="w-5 h-5 mr-2" />
-                Track your Pro on the day
+                {t('bk_track_pro')}
               </a>
             )}
           </div>
@@ -669,7 +683,7 @@ export default function BookPage() {
 
       {/* Footer */}
       <footer className="w-full text-center py-4 text-[var(--color-gw-muted)] text-xs border-t border-[var(--color-gw-bdr)]">
-        Powered by GigWrench. All rights reserved.
+        {t('bk_footer')}
       </footer>
     </div>
   )
